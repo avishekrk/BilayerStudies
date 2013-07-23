@@ -20,12 +20,12 @@ void read_xyz(char *file)
       exit(1);
     }
   fscanf(in, "%d", &numatoms);
-  printf("Number of Atoms: %d\n",numatoms);
+  printf("%d\n",numatoms);
   fscanf(in, "%s\n",&buffer);
   printf("%s\n",buffer);
   while(4 == fscanf(in,"%s %f %f %f\n",&atom,&x,&y,&z) )
     {
-      printf("%s %f %f %f\n",atom,x,y,z); 
+      printf("%s %.15f %.15f %.15f\n",atom,x,y,z); 
     }
   fclose(in);
 }//read_xyz()
