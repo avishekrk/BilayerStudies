@@ -41,6 +41,5 @@ int main(int argc, char *argv[])
 
   read_xyz(argv[1]); 
 
-  std::cout<< "Hello Wold" << std::endl; 
   return 0; 
 }
