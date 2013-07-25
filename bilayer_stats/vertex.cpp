@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cstdio>
 
-#include "graph.h"
+#include "vertex.h"
 
 /*
   Contstructor for Vertex Objects

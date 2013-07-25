@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "graph.h"
+#include "vertex.h"
 
 /*
   read_xyz: reads a file in the xyz format 
