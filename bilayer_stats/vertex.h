@@ -17,10 +17,11 @@ class Vertex
   float z; 
   int index;
   string type; 
+  int atomno; 
   Vertex();
   std::vector<Vertex*> edges; 
   std::vector<vector<Vertex*> > rings;
-  Vertex(float xIn, float yIn, float zIn);
+  Vertex(int type,float xIn, float yIn, float zIn);
   Vertex(Vertex &v);
 
   void AddEdge(Vertex* edge);

@@ -18,8 +18,9 @@ Vertex::Vertex()
   z = 0; 
 }//Vertex()
 
-Vertex::Vertex(float xIn, float yIn, float zIn)
+Vertex::Vertex(int type,float xIn, float yIn, float zIn)
 {
+  atomno = type; 
   x = xIn; 
   y = yIn;
   z = zIn; 

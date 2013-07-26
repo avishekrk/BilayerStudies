@@ -3,13 +3,16 @@
 
 #include <vector>
 #include <algorithm>
+
+#include "vertex.h"
+
 using namespace std; 
 
 class Graph
 {
  public:
   Graph();
-  std::vector<Vertex*> vertices; 
+  std::vector <Vertex*> vertices; 
     
 };
 

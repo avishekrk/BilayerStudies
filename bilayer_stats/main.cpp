@@ -6,6 +6,10 @@
 #include <vector>
 
 #include "vertex.h"
+#include "graph.h"
+
+//global variables 
+Graph bilayer; 
 
 /*
   read_xyz: reads a file in the xyz format 
@@ -31,13 +35,23 @@ void read_xyz(char *file)
   while(4 == fscanf(in,"%s %f %f %f\n",&atom,&x,&y,&z) )
     {
       printf("%s %.15f %.15f %.15f\n",atom,x,y,z);
-      Vertex* pos = new Vertex(x,y,z); 
-      list.push_back(pos); 
+      if (atom[0] == 'C')
+	{
+	  Vertex* pos = new Vertex(4,x,y,z); 
+	  list.push_back(pos); 
+	  
+	}
+      else
+	{
+	  Vertex* pos = new Vertex(14,x,y,z); 
+	  list.push_back(pos); 
+	}
+      
     }
   fclose(in);
   
   for(unsigned int i = 0; i < list.size(); i++)
-    std::cout << list[i]->x << " " << list[i]->y << " " << list[i]->z << std::endl; 
+    std::cout << list[i]->atomno << " " << list[i]->x << " " << list[i]->y << " " << list[i]->z << std::endl; 
 
 
 }//read_xyz()
@@ -51,10 +65,9 @@ int main(int argc, char *argv[])
       exit(1);  
     }
 
-  read_xyz(argv[1]); 
-  Vertex v(4.0,23.5,0.0); 
-  std::cout << v.type << " " << v.x << " " << v.y << " " << v.z << std::endl; 
   
+  read_xyz(argv[1]); 
+    
 
   return 0; 
-}
+}//main()
