@@ -50,3 +50,57 @@ Vertex::Vertex(Vertex &v)
     }//i loop 
  
 }//Vertex()
+
+/*
+  Creates an Edge between to vertices
+  @param: Pointer to Vertex object 
+ */
+void Vertex::AddEdge(Vertex* edge)
+{
+  for(unsigned int i = 0; i < edges.size(); i++)
+    {
+      if(edges[i] == edge)
+	return; 
+    }
+
+  edges.push_back(edge); 
+  edge->AddEdge((Vertex*)this);
+}
+
+/*
+Delete an edge by pointer to adjacent vertex
+@param edges: pointer of edge to be deleted
+*/
+int Vertex::RemoveEdge(Vertex* edge)
+{
+  for(unsigned int i = 0; i < edges.size(); i++)
+    {
+      if(edges[i] == edge)
+	{
+	  Vertex* pointerToNeighbor = edges[i];
+          edges.erase(edges.begin() + i);
+          pointerToNeighbor->RemoveSingleEdge((Vertex*)this);
+          return 0;
+  
+	}
+    }
+  return -1; 
+}//RemoveEdge()
+
+/*
+  Remove edge from one list only
+  @param edges: Removes a single edge
+ */
+int Vertex::RemoveSingleEdge(Vertex* edge)
+{
+  for(unsigned int i = 0; i < edges.size(); i++)
+    {
+      if(edges[i] == edge)
+        {
+          edges.erase(edges.begin() + i);
+          return 0;
+        }
+    }
+  return -1;
+
+}//RemoveSingleEdge()

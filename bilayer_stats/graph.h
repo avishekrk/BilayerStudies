@@ -12,7 +12,7 @@ class Graph
 {
  public:
   Graph();
-  std::vector <Vertex*> vertices; 
+  std::vector<Vertex*> vertices; 
     
 };
 
