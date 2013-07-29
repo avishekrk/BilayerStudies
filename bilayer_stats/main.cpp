@@ -160,15 +160,15 @@ void cycleDump(std::vector <std::vector<Vertex*> > &allCycles)
   cycle = fopen("cycleList.dat" ,"w");
 
 
-  for(int i = 0; i<12; i++)
+  for(unsigned int i = 0; i<12; i++)
     {
       fprintf(cycle,"\n");
       fprintf(cycle, "RING SIZE %d\n" , i);
-      for(int j =0; j < allCycles.size(); j++)
+      for(unsigned int j =0; j < allCycles.size(); j++)
         {
 	  std::vector <Vertex*> Ring = allCycles[j];
           if(Ring.size() != i) continue;
-          for(int k =0; k<Ring.size(); k++) fprintf(cycle, "Circle[{%f,%f},0.2],\n",Ring[k]->x,Ring[k]->y);
+          for(unsigned int k =0; k<Ring.size(); k++) fprintf(cycle, "Circle[{%f,%f},0.2],\n",Ring[k]->x,Ring[k]->y);
           fprintf(cycle,"\n");
         }
       fprintf(cycle, "\n");
@@ -178,6 +178,95 @@ void cycleDump(std::vector <std::vector<Vertex*> > &allCycles)
 }//cycleDump()
 
 
+/*
+  AddRings to vertices. Good for looking for superrings,
+  rings that are made of smaller rings. 
+ */
+void AddRings(vector <vector<Vertex*> > &allCycles)
+{
+  for(unsigned int i = 0; i < allCycles.size(); i++)
+    {
+      for(unsigned int j = 0; j < allCycles[i].size(); j++)
+	{
+	  allCycles[i][j]->AddRing(allCycles[i]); 
+	}
+    }
+}//AddRings()
+
+/*
+  secondSort,Deletes rings that are combination of others from the ring list.
+  @param bilayer, bilayer object
+  @param allCycles, vector of vector of Vertex* containing ring list 
+  @param i, int of the vertex
+*/
+void secondSort(Graph &bilayer, std::vector<std::vector<Vertex*> > &allCycles, int &i)
+{
+  for(unsigned int k = 0; k < bilayer.vertices[i]->rings.size(); k++) //sort through ring list of vertex i 
+    {
+      if(bilayer.vertices[i]->rings[k].size() < 9)
+	continue; 
+      std::vector <Vertex*> kCycle = bilayer.vertices[i]->rings[k]; 
+      for(unsigned int l = 0; bilayer.vertices[i]->rings.size(); l++)
+	{
+	  if(bilayer.vertices[i]->rings[l] > 5)
+	    continue; 
+	  std::vector <Vertex*> lCycle = bilayer.vertices[i]->rings[l]; 
+	  int num_matches = 0; 
+	  for(unsigned int m = 0; m < lCycle.size(); m++)
+	    {
+	      for(unsigned int n = 0; n < kCycle.size(); n++)
+		{
+		  if(lCycle[m] == kCycle[n])
+		    num_matches++; 
+		}//n loop over the vertices of the kCycle 
+	    }//m loop over the vertices of lCycle 
+	  if(num_matches > 3)
+	    {
+	      for(int i = 0; i < allCycles.size(); i++)
+		{
+		  if(kCycle == allCycles[i])
+		    allCycles.erase(allCycles.begin() + i); 
+		}//i loop over the CycleList 
+	    }
+	}// l loop over the ring list 
+    }//k loop over the rings looking for rings greater than nine specific vertex 
+}//secondSort()
+
+void secondSuperRing(Graph &honeycomb, std::vector <std::vector<Vertex*> > &allCycles)
+{
+  for(int i =0; i< honeycomb.vertices.size(); i++) //sort the ringList 
+    {
+      for(int j =0; j< honeycomb.vertices[i]->rings.size(); j++)
+	{
+	  std::sort(honeycomb.vertices[i]->rings.begin(), honeycomb.vertices[i]->rings.end());
+	}
+    }
+
+  for(int i =0; i < honeycomb.vertices.size(); i++) //Search through the vertices 
+    {
+      if(honeycomb.vertices[i]->rings.size() <4) continue; //Find a vertex that has more than 3 rings 
+      bool fiveRing = false;
+      bool nineRing = false;
+      for(int j =0; j<honeycomb.vertices[i]->rings.size(); j++) //Search through the rings of the particuler vertex 
+	{
+	  if(honeycomb.vertices[i]->rings[j].size() == 5)
+	    {
+	      fiveRing = true;
+	            
+	    }
+	  else if(honeycomb.vertices[i]->rings[j].size() > 9)
+	    {
+	      nineRing = true; 
+	        
+	    }
+        }
+      if(fiveRing && nineRing) //Found a SuperRing 
+	{
+	    
+	  secondSort(honeycomb,allCycles, i); 
+	}
+    }
+}//secondSuperRing()
 
 int main(int argc, char *argv[])
 {
@@ -198,6 +287,7 @@ int main(int argc, char *argv[])
   std::cout << bilayer.vertices[967]->x << " " << bilayer.vertices[967]->y << " " << bilayer.vertices[967]->z << std::endl; 
   MakeHoney(bilayer,"honeycomb1.m"); 
   std::cout << bilayer.vertices[705]->x << " " << bilayer.vertices[705]->y << " " << bilayer.vertices[705]->z << std::endl;
+
   //start counting cycles 
   bilayer.vertices[705]->CountCyclesLocally(allCycles); 
   bilayer.FirstSort(allCycles); 
@@ -212,7 +302,11 @@ int main(int argc, char *argv[])
 	  std::cout << allCycles[i][j]->x << " " << allCycles[i][j]->y << " " << allCycles[i][j]->z << std::endl; 
 	}
     }
+  
+  AddRings(allCycles);
+  secondSuperRing(bilayer,allCycles); 
   cycleDump(allCycles);
+  fillCountBucket(countBucket,allCycles); 
 
 
   return 0; 

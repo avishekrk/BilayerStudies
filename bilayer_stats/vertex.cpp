@@ -104,3 +104,17 @@ int Vertex::RemoveSingleEdge(Vertex* edge)
   return -1;
 
 }//RemoveSingleEdge()
+
+/*
+  Add a ring to the ring list of a vertex
+  @param cycle. Ring to add to the vertex. 
+*/
+void Vertex::AddRing(std::vector<Vertex*> cycle)
+{
+  for(unsigned int j = 0; j < rings.size(); j++)
+    {
+      if(rings[j] == cycle)
+	return; 
+    }
+  rings.push_back(cycle); 
+}//AddRing()
