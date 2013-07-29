@@ -31,6 +31,11 @@ class Vertex
   void ClearConnection();
   void ModifyData(double xNew, double yNew, double zNew);
 
+  //Ring Counter Functions 
+  Vertex* BFS(double xFind, double yFind, int searchDepth);
+  void findCyclesToSelf(int maxCycleSize, std::vector<std::vector<Vertex*> > &cycleList);
+  void CountCyclesLocally(std::vector<std::vector<Vertex*> >& allCycles);
+
 
 };
 
