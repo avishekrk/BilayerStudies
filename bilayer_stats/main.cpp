@@ -201,18 +201,18 @@ void AddRings(vector <vector<Vertex*> > &allCycles)
 */
 void secondSort(Graph &bilayer, std::vector<std::vector<Vertex*> > &allCycles, int &i)
 {
-  for(unsigned int k = 0; k < bilayer.vertices[i]->rings.size(); k++) //sort through ring list of vertex i 
+  for(unsigned int k = 0; k < bilayer.vertices[i]->rings.size(); k++) //iterate through ring list of vertex i to find a ring greater than 8  
     {
-      if(bilayer.vertices[i]->rings[k].size() < 9)
+      if(bilayer.vertices[i]->rings[k].size() < 7)
 	continue; 
       std::vector <Vertex*> kCycle = bilayer.vertices[i]->rings[k]; 
-      for(unsigned int l = 0; bilayer.vertices[i]->rings.size(); l++)
+      for(unsigned int l = 0; l< bilayer.vertices[i]->rings.size(); l++)//iterate through all rings of the vertex to find smaller rings that are apart of the greater 
 	{
-	  if(bilayer.vertices[i]->rings[l] > 5)
+	  if(bilayer.vertices[i]->rings[l].size() >= kCycle.size() )
 	    continue; 
 	  std::vector <Vertex*> lCycle = bilayer.vertices[i]->rings[l]; 
 	  int num_matches = 0; 
-	  for(unsigned int m = 0; m < lCycle.size(); m++)
+	  for(unsigned int m = 0; m < lCycle.size(); m++)//iterate through the vertices of the smaller ring to see if they are in the larger ring
 	    {
 	      for(unsigned int n = 0; n < kCycle.size(); n++)
 		{
@@ -222,10 +222,10 @@ void secondSort(Graph &bilayer, std::vector<std::vector<Vertex*> > &allCycles, i
 	    }//m loop over the vertices of lCycle 
 	  if(num_matches > 3)
 	    {
-	      for(int i = 0; i < allCycles.size(); i++)
+	      for(unsigned int o = 0; o < allCycles.size(); o++)
 		{
-		  if(kCycle == allCycles[i])
-		    allCycles.erase(allCycles.begin() + i); 
+		  if(kCycle == allCycles[o])
+		    allCycles.erase(allCycles.begin() + o); 
 		}//i loop over the CycleList 
 	    }
 	}// l loop over the ring list 
@@ -234,9 +234,9 @@ void secondSort(Graph &bilayer, std::vector<std::vector<Vertex*> > &allCycles, i
 
 void secondSuperRing(Graph &honeycomb, std::vector <std::vector<Vertex*> > &allCycles)
 {
-  for(int i =0; i< honeycomb.vertices.size(); i++) //sort the ringList 
+  for(unsigned int i =0; i< honeycomb.vertices.size(); i++) //sort the ringList 
     {
-      for(int j =0; j< honeycomb.vertices[i]->rings.size(); j++)
+      for(unsigned int j =0; j< honeycomb.vertices[i]->rings.size(); j++)
 	{
 	  std::sort(honeycomb.vertices[i]->rings.begin(), honeycomb.vertices[i]->rings.end());
 	}
@@ -278,18 +278,17 @@ int main(int argc, char *argv[])
     }
   
   
-  
   read_xyz(argv[1],bilayer);
   connectAtoms(bilayer,2.1);
-
+  int special = 657; 
   bilayer.vertices[969]->AddEdge(bilayer.vertices[967]); 
   std::cout << bilayer.vertices[969]->x << " " << bilayer.vertices[969]->y << " " << bilayer.vertices[969]->z << std::endl; 
   std::cout << bilayer.vertices[967]->x << " " << bilayer.vertices[967]->y << " " << bilayer.vertices[967]->z << std::endl; 
   MakeHoney(bilayer,"honeycomb1.m"); 
-  std::cout << bilayer.vertices[705]->x << " " << bilayer.vertices[705]->y << " " << bilayer.vertices[705]->z << std::endl;
+  std::cout << bilayer.vertices[special]->x << " " << bilayer.vertices[special]->y << " " << bilayer.vertices[special]->z << std::endl;
 
   //start counting cycles 
-  bilayer.vertices[705]->CountCyclesLocally(allCycles); 
+  bilayer.vertices[special]->CountCyclesLocally(allCycles); 
   bilayer.FirstSort(allCycles); 
   
   fillCountBucket(countBucket,allCycles); 
@@ -304,10 +303,12 @@ int main(int argc, char *argv[])
     }
   
   AddRings(allCycles);
-  secondSuperRing(bilayer,allCycles); 
-  cycleDump(allCycles);
-  fillCountBucket(countBucket,allCycles); 
+  //secondSuperRing(bilayer,allCycles); 
 
+  cycleDump(allCycles);
+  secondSort(bilayer,allCycles,special); 
+  fillCountBucket(countBucket,allCycles); 
+  cycleDump(allCycles); 
 
   return 0; 
 }//main()
