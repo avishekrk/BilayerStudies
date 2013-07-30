@@ -199,7 +199,7 @@ void AddRings(vector <vector<Vertex*> > &allCycles)
   @param allCycles, vector of vector of Vertex* containing ring list 
   @param i, int of the vertex
 */
-void secondSort(Graph &bilayer, std::vector<std::vector<Vertex*> > &allCycles, int &i)
+void secondSort(Graph &bilayer, std::vector<std::vector<Vertex*> > &allCycles, int i)
 {
   for(unsigned int k = 0; k < bilayer.vertices[i]->rings.size(); k++) //iterate through ring list of vertex i to find a ring greater than 8  
     {
@@ -280,7 +280,7 @@ int main(int argc, char *argv[])
   
   read_xyz(argv[1],bilayer);
   connectAtoms(bilayer,2.1);
-  int special = 657; 
+  int special = 705; 
   bilayer.vertices[969]->AddEdge(bilayer.vertices[967]); 
   std::cout << bilayer.vertices[969]->x << " " << bilayer.vertices[969]->y << " " << bilayer.vertices[969]->z << std::endl; 
   std::cout << bilayer.vertices[967]->x << " " << bilayer.vertices[967]->y << " " << bilayer.vertices[967]->z << std::endl; 
@@ -288,27 +288,16 @@ int main(int argc, char *argv[])
   std::cout << bilayer.vertices[special]->x << " " << bilayer.vertices[special]->y << " " << bilayer.vertices[special]->z << std::endl;
 
   //start counting cycles 
-  bilayer.vertices[special]->CountCyclesLocally(allCycles); 
+  for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
+    bilayer.vertices[i]->CountCyclesLocally(allCycles); 
+  
   bilayer.FirstSort(allCycles); 
-  
-  fillCountBucket(countBucket,allCycles); 
-
-  for(unsigned int i = 0; i < allCycles.size(); i++)
-    {
-      std::cout << "RING " << i+1 << std::endl; 
-      for(unsigned int j = 0; j < allCycles[i].size(); j++)
-	{
-	  std::cout << allCycles[i][j]->x << " " << allCycles[i][j]->y << " " << allCycles[i][j]->z << std::endl; 
-	}
-    }
-  
   AddRings(allCycles);
-  //secondSuperRing(bilayer,allCycles); 
-
-  cycleDump(allCycles);
-  secondSort(bilayer,allCycles,special); 
+  std::cout << "Sorting through the Rings Now" << std::endl; 
+  for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
+    secondSort(bilayer,allCycles,i); 
   fillCountBucket(countBucket,allCycles); 
   cycleDump(allCycles); 
-
+  
   return 0; 
 }//main()

@@ -194,13 +194,14 @@ void Vertex::findCyclesToSelf(int maxCycleSize, std::vector<std::vector<Vertex*>
 */
 void Vertex::CountCyclesLocally(std::vector<std::vector<Vertex*> >& allCycles)
 {
-  // allCycles.clear(); //empty the cycleList                                                                                                                                                  
+
   this->findCyclesToSelf(11, allCycles);
   
-  for(unsigned int i = 0; i < allCycles.size(); i++) //Make sure cycle doesn't go back on itself                                                                                             
+  for(unsigned int i = 0; i < allCycles.size(); i++) //Make sure cycle doesn't go back on itself                            {
     {
       for(unsigned int j = 0; j < allCycles[i].size(); j++)
-	{ bool ifbreak = false;
+	{ 
+	  bool ifbreak = false;
 	  Vertex* current = (allCycles[i])[j];
 	  for(unsigned int k = 0; k < allCycles[i].size(); k++)
 	    {
@@ -212,12 +213,12 @@ void Vertex::CountCyclesLocally(std::vector<std::vector<Vertex*> >& allCycles)
 		}
 	    }
 	  if(ifbreak) break;
-	}
-    }
+	}//j loop over cycle 
+    }//i loop over cyclelist 
   
   //    avoidSuperRing(allCycles); //makes sure none of the big rings are apart of smaller rings. maybe make apart of AddNoRepeats                                                           
   
-}
+}//CountCyclesLocally()
 
 void Graph::FirstSort(std::vector<std::vector<Vertex*> > &allCycles)
 {
