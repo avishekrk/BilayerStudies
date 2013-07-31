@@ -21,7 +21,7 @@ std::vector<std::vector<int> > stack;
   read_xyz: reads a file in the xyz format 
   @param: file, xyz file 
 */
-void read_xyz(char *file, Graph &bilayer)
+void read_xyz(char *file, Graph &bilayer,bool Debug=false)
 {
   int numatoms;
   char buffer[3],atom[2];
@@ -34,12 +34,16 @@ void read_xyz(char *file, Graph &bilayer)
       exit(1);
     }
   fscanf(in, "%d", &numatoms);
-  printf("%d\n",numatoms);
   fscanf(in, "%s\n",&buffer);
-  printf("%s\n",buffer);
+  if(Debug)
+    {
+      printf("%d\n",numatoms);
+      printf("%s\n",buffer);
+    }
   while(4 == fscanf(in,"%s %f %f %f\n",&atom,&x,&y,&z) )
     {
-      printf("%s %.15f %.15f %.15f\n",atom,x,y,z);
+      if(Debug)
+	printf("%s %.15f %.15f %.15f\n",atom,x,y,z);
       if (atom[0] == 'O')
 	{
 	  continue; 
@@ -231,42 +235,6 @@ void secondSort(Graph &bilayer, std::vector<std::vector<Vertex*> > &allCycles, i
 	}// l loop over the ring list 
     }//k loop over the rings looking for rings greater than nine specific vertex 
 }//secondSort()
-
-void secondSuperRing(Graph &honeycomb, std::vector <std::vector<Vertex*> > &allCycles)
-{
-  for(unsigned int i =0; i< honeycomb.vertices.size(); i++) //sort the ringList 
-    {
-      for(unsigned int j =0; j< honeycomb.vertices[i]->rings.size(); j++)
-	{
-	  std::sort(honeycomb.vertices[i]->rings.begin(), honeycomb.vertices[i]->rings.end());
-	}
-    }
-
-  for(int i =0; i < honeycomb.vertices.size(); i++) //Search through the vertices 
-    {
-      if(honeycomb.vertices[i]->rings.size() <4) continue; //Find a vertex that has more than 3 rings 
-      bool fiveRing = false;
-      bool nineRing = false;
-      for(int j =0; j<honeycomb.vertices[i]->rings.size(); j++) //Search through the rings of the particuler vertex 
-	{
-	  if(honeycomb.vertices[i]->rings[j].size() == 5)
-	    {
-	      fiveRing = true;
-	            
-	    }
-	  else if(honeycomb.vertices[i]->rings[j].size() > 9)
-	    {
-	      nineRing = true; 
-	        
-	    }
-        }
-      if(fiveRing && nineRing) //Found a SuperRing 
-	{
-	    
-	  secondSort(honeycomb,allCycles, i); 
-	}
-    }
-}//secondSuperRing()
 
 int main(int argc, char *argv[])
 {
