@@ -1,0 +1,4 @@
+set background white
+polyhedra bonds
+color polyhedra yellow 
+connect (all) (all) delete 
