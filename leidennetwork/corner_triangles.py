@@ -48,6 +48,30 @@ def print_atom(coordinates,atom="C"):
     for cord in coordinates:
         print "%s %f %f 0.00000" %(atom,cord[0],cord[1])
 
+def pbc_check(cordi,cordj,a,b):
+    """
+    function
+       pbc_check, checks for peridic boundary conditions
+    parameters
+       cordi, (N,2) numpy array of coordinates 
+       cordj, (N,2) numpy array of coordinates 
+       a, (N,2) lattice vector 
+       b, (N,2) lattice vector 
+    return
+      new cordj taking into acount pbc 
+    """
+    rij = cordi - cordj
+    ghost = cordj
+    if rij[0] > a[0]/2.:
+        ghost = ghost - a
+    if rij[0] < -(a[0]/2.):
+        ghost = ghost + a
+    if rij[1] > b[1]/2.:
+        ghost = ghost - b
+    if rij[1] < -(b[1]/2):
+        ghost = ghost + b
+    return ghost 
+
 
 def main(Debug=False):
     
@@ -62,27 +86,29 @@ def main(Debug=False):
     
     #ouput connections
     midpoints=[]
+    dumlist =[]
     for i in range(0,len(connect)):
         vertex = connect[i][0]
         for j in range(1,len(connect[i])):
             repeat = False
+            inpblist = False 
             atomj = connect[i][j]
-            rij = coordinates[vertex] + coordinates[atomj]
             if(Debug):
                 print coordinates[vertex]
                 print coordinates[atomj]
-            rij = coordinates[vertex] - coordinates[atomj]
-            ghost = coordinates[atomj]
-            if rij[0] > a[0]/2.:
-                ghost = ghost - a
-            if rij[0] < -(a[0]/2.):
-                ghost = ghost + a
-            if rij[1] > b[1]/2.:
-                ghost = ghost - b
-            if rij[1] < -(b[1]/2):
-                ghost = ghost + b 
+            ghost = pbc_check(coordinates[vertex], coordinates[atomj],a,b)
+            if ghost[0] != coordinates[atomj][0] or ghost[1] != coordinates[atomj][1]:
+                if(Debug):
+                    print vertex
+                    print atomj 
+                    print coordinates[vertex] - coordinates[atomj]
+                    print coordinates[vertex]
+                    print coordinates[atomj]
+                if vertex > atomj:
+                    continue
+                else:
+                    dumlist.append([vertex,atomj])
             midpoint = 0.5*(coordinates[vertex] + ghost)
-            
             for mid in midpoints:
                 if all(midpoint == mid):
                     repeat = True
@@ -91,7 +117,9 @@ def main(Debug=False):
                 continue
             else:
                 midpoints.append(midpoint)
-            
+    
+    if(Debug):
+        print dumlist 
 
     numatom = len(coordinates) + len(midpoints)
     print numatom
