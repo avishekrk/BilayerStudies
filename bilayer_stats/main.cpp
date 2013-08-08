@@ -13,8 +13,8 @@
 //global variables 
 Graph bilayer; 
 std::vector<std::vector<Vertex*> > allCycles;
-std::vector<std::vector<Vertex*> > tempCycles;
-int countBucket[12];
+const int ringmax = 12; 
+int countBucket[ringmax];
 std::vector<std::vector<int> > stack; 
 
 /*
@@ -52,18 +52,14 @@ void read_xyz(char *file, Graph &bilayer,bool Debug=false)
 	{
 	  Vertex* pos = new Vertex(14,x,y,z); 
 	  bilayer.vertices.push_back(pos); 
-	  std::cout << bilayer.vertices.size() << std::endl; 
 	}
       
     }
   fclose(in);
   
   for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
-    {
-      bilayer.vertices[i]->index = i; 
-    }
-
-
+    bilayer.vertices[i]->index = i; 
+  
 }//read_xyz()
 
 
@@ -100,6 +96,11 @@ void connectAtoms(Graph &bilayer,float dist,int Debug=0)
     }//i loop
 }//connectatoms
 
+/*
+  MakeHoney, Output coordinates to be visualized in Mathematica
+  @param bilayer, Graph object containing vertices 
+  @param nfile, array of characters for name of output file
+ */
 void MakeHoney(Graph& bilayer, char *nfile)
 {
   FILE *outFile; 
@@ -157,13 +158,15 @@ void fillCountBucket(int countBucket[], std::vector <std::vector<Vertex*> > &all
 
 }//fillCountBucket()
 
-/*Outputs Rings*/
+/*
+  cycleDump,Outputs Rings in Mathematica format
+  @param allCycles, vector of vector of Vertex objects containing rings
+*/
 void cycleDump(std::vector <std::vector<Vertex*> > &allCycles)
 {
   FILE* cycle;
   cycle = fopen("cycleList.dat" ,"w");
-
-
+  
   for(unsigned int i = 0; i<12; i++)
     {
       fprintf(cycle,"\n");
@@ -172,12 +175,13 @@ void cycleDump(std::vector <std::vector<Vertex*> > &allCycles)
         {
 	  std::vector <Vertex*> Ring = allCycles[j];
           if(Ring.size() != i) continue;
-          for(unsigned int k =0; k<Ring.size(); k++) fprintf(cycle, "Circle[{%f,%f},0.2],\n",Ring[k]->x,Ring[k]->y);
+          for(unsigned int k =0; k<Ring.size(); k++) 
+	    fprintf(cycle, "Circle[{%f,%f},0.2],\n",Ring[k]->x,Ring[k]->y);
           fprintf(cycle,"\n");
         }
       fprintf(cycle, "\n");
     }
-
+  
   fclose(cycle);
 }//cycleDump()
 
@@ -191,9 +195,8 @@ void AddRings(vector <vector<Vertex*> > &allCycles)
   for(unsigned int i = 0; i < allCycles.size(); i++)
     {
       for(unsigned int j = 0; j < allCycles[i].size(); j++)
-	{
-	  allCycles[i][j]->AddRing(allCycles[i]); 
-	}
+	allCycles[i][j]->AddRing(allCycles[i]); 
+	
     }
 }//AddRings()
 
@@ -236,6 +239,28 @@ void secondSort(Graph &bilayer, std::vector<std::vector<Vertex*> > &allCycles, i
     }//k loop over the rings looking for rings greater than nine specific vertex 
 }//secondSort()
 
+/*
+  Caclulates second moment from ring distribution. 
+ */
+float secondmoment()
+{
+  int sum = 0;  
+  float avgringsize = 0.0;  
+  float moment2 = 0.0; 
+
+  for(int i = 0; i < ringmax; i++)
+    sum += countBucket[i];
+      
+  for(int i = 0; i< ringmax; i++)
+    avgringsize += i*((float)countBucket[i]/sum); 
+
+  for(int i = 0; i < ringmax; i++)
+    moment2 += (i-avgringsize)*(i-avgringsize)*((float)countBucket[i]/sum); 
+      
+  return moment2; 
+
+}//secondmoment()
+
 int main(int argc, char *argv[])
 {
   
@@ -245,27 +270,26 @@ int main(int argc, char *argv[])
       exit(1);  
     }
   
-  
   read_xyz(argv[1],bilayer);
   connectAtoms(bilayer,2.1);
-  int special = 705; 
-  bilayer.vertices[969]->AddEdge(bilayer.vertices[967]); 
-  std::cout << bilayer.vertices[969]->x << " " << bilayer.vertices[969]->y << " " << bilayer.vertices[969]->z << std::endl; 
-  std::cout << bilayer.vertices[967]->x << " " << bilayer.vertices[967]->y << " " << bilayer.vertices[967]->z << std::endl; 
+
+  bilayer.vertices[969]->AddEdge(bilayer.vertices[967]); //arbitrary connection  
   MakeHoney(bilayer,"honeycomb1.m"); 
-  std::cout << bilayer.vertices[special]->x << " " << bilayer.vertices[special]->y << " " << bilayer.vertices[special]->z << std::endl;
 
   //start counting cycles 
   for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
     bilayer.vertices[i]->CountCyclesLocally(allCycles); 
-  
   bilayer.FirstSort(allCycles); 
   AddRings(allCycles);
   std::cout << "Sorting through the Rings Now" << std::endl; 
   for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
     secondSort(bilayer,allCycles,i); 
+
+  //Ring Statistics 
   fillCountBucket(countBucket,allCycles); 
   cycleDump(allCycles); 
+  float mu = secondmoment(); 
+  std::cout << "mu2= " << secondmoment() << std::endl; 
   
   return 0; 
 }//main()
