@@ -226,7 +226,7 @@ void Graph::FirstSort(std::vector<std::vector<Vertex*> > &allCycles)
 }
 
 
-void Graph::CountCycles(std::vector<std::vector<Vertex*> >& allCycles, int* countBucket)
+void Graph::CountCycles(std::vector<std::vector<Vertex*> >& allCycles)
 {
   allCycles.clear(); //empty the cycleList
   for(unsigned int i = 0; i < vertices.size(); i++) //BFS to find itself 

@@ -24,7 +24,8 @@ std::vector<std::vector<int> > stack;
 void read_xyz(char *file, Graph &bilayer,bool Debug=false)
 {
   int numatoms;
-  char buffer[3],atom[2];
+  char buffer[3];
+  char atom[2]; 
   float x,y,z;
   FILE *in; 
   in = fopen(file,"r");
@@ -34,13 +35,13 @@ void read_xyz(char *file, Graph &bilayer,bool Debug=false)
       exit(1);
     }
   fscanf(in, "%d", &numatoms);
-  fscanf(in, "%s\n",&buffer);
+  fscanf(in, "%s\n",buffer);
   if(Debug)
     {
       printf("%d\n",numatoms);
       printf("%s\n",buffer);
     }
-  while(4 == fscanf(in,"%s %f %f %f\n",&atom,&x,&y,&z) )
+  while(4 == fscanf(in,"%s %f %f %f\n",atom,&x,&y,&z) )
     {
       if(Debug)
 	printf("%s %.15f %.15f %.15f\n",atom,x,y,z);
@@ -101,10 +102,10 @@ void connectAtoms(Graph &bilayer,float dist,int Debug=0)
   @param bilayer, Graph object containing vertices 
   @param nfile, array of characters for name of output file
  */
-void MakeHoney(Graph& bilayer, char *nfile)
+void MakeHoney(Graph& bilayer, string nfile="honeycomb1.m")
 {
   FILE *outFile; 
-  outFile = fopen(nfile , "w");
+  outFile = fopen(nfile.c_str() , "w");
   fprintf(outFile, "Graphics[{Black");
 
 
@@ -270,11 +271,13 @@ int main(int argc, char *argv[])
       exit(1);  
     }
   
+  string out = "honeycomb1.m";
+
   read_xyz(argv[1],bilayer);
   connectAtoms(bilayer,2.1);
 
   bilayer.vertices[969]->AddEdge(bilayer.vertices[967]); //arbitrary connection  
-  MakeHoney(bilayer,"honeycomb1.m"); 
+  MakeHoney(bilayer); 
 
   //start counting cycles 
   for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
@@ -288,7 +291,6 @@ int main(int argc, char *argv[])
   //Ring Statistics 
   fillCountBucket(countBucket,allCycles); 
   cycleDump(allCycles); 
-  float mu = secondmoment(); 
   std::cout << "mu2= " << secondmoment() << std::endl; 
   
   return 0; 

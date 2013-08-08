@@ -17,7 +17,7 @@ class Graph
     
   //Ring Counter Routines 
   void FirstSort(std::vector<std::vector<Vertex*> > &allCycles);
-  void CountCycles(std::vector<std::vector<Vertex*> >& allCycles, int* countBucket);
+  void CountCycles(std::vector<std::vector<Vertex*> >& allCycles);
 
 };
 
