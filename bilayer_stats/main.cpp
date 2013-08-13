@@ -18,7 +18,8 @@ int countBucket[ringmax];
 std::vector<std::vector<int> > stack; 
 
 /*
-  read_xyz: reads a file in the xyz format 
+  read_xyz: reads a file in the xyz format omiting oxygen 
+  atoms  
   @param: file, xyz file 
 */
 void read_xyz(char *file, Graph &bilayer,bool Debug=false)
@@ -209,7 +210,7 @@ void AddRings(vector <vector<Vertex*> > &allCycles)
 */
 void secondSort(Graph &bilayer, std::vector<std::vector<Vertex*> > &allCycles, int i)
 {
-  for(unsigned int k = 0; k < bilayer.vertices[i]->rings.size(); k++) //iterate through ring list of vertex i to find a ring greater than 8  
+  for(unsigned int k = 0; k < bilayer.vertices[i]->rings.size(); k++) //iterate through ring list of vertex i to find a ring greater than seven  
     {
       if(bilayer.vertices[i]->rings[k].size() < 7)
 	continue; 
@@ -274,9 +275,9 @@ int main(int argc, char *argv[])
   string out = "honeycomb1.m";
 
   read_xyz(argv[1],bilayer);
-  connectAtoms(bilayer,2.1);
+  connectAtoms(bilayer,2.3);
 
-  bilayer.vertices[969]->AddEdge(bilayer.vertices[967]); //arbitrary connection  
+  // bilayer.vertices[969]->AddEdge(bilayer.vertices[967]); //arbitrary connection  
   MakeHoney(bilayer); 
 
   //start counting cycles 
