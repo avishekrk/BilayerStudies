@@ -8,7 +8,7 @@
 
 #include "vertex.h"
 #include "graph.h"
-
+#include "ringarea.h"
 
 //global variables 
 Graph bilayer; 
@@ -275,9 +275,9 @@ int main(int argc, char *argv[])
   string out = "honeycomb1.m";
 
   read_xyz(argv[1],bilayer);
-  connectAtoms(bilayer,2.3);
+  connectAtoms(bilayer,2.2);
 
-  // bilayer.vertices[969]->AddEdge(bilayer.vertices[967]); //arbitrary connection  
+  //bilayer.vertices[969]->AddEdge(bilayer.vertices[967]); //arbitrary connection  
   MakeHoney(bilayer); 
 
   //start counting cycles 
@@ -292,7 +292,11 @@ int main(int argc, char *argv[])
   //Ring Statistics 
   fillCountBucket(countBucket,allCycles); 
   cycleDump(allCycles); 
-  std::cout << "mu2= " << secondmoment() << std::endl; 
+  std::cout << "mu2 = " << secondmoment() << std::endl; 
   
+  Hello(); 
+  for(unsigned int i = 0; i < allCycles.size(); i++)
+    ringArea(allCycles[i]); 
+
   return 0; 
 }//main()
