@@ -4,4 +4,4 @@
 #include "vertex.h"
 
 void Hello(); 
-void ringArea(std::vector<Vertex*>  &ring); 
+float ringArea(std::vector<Vertex*>  &ring); 

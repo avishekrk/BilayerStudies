@@ -17,7 +17,7 @@ void Hello()
 /*
   ringArea, calculated the area of of convex polygon 
  */
-void ringArea(std::vector<Vertex*>  &ring)
+float ringArea(std::vector<Vertex*>  &ring)
 {
   unsigned int n = ring.size() + 1; 
   float *x = new float [n];
@@ -57,5 +57,5 @@ void ringArea(std::vector<Vertex*>  &ring)
   delete [] x; 
   delete [] y; 
    
-  
+  return area; 
 }

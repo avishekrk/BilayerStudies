@@ -5,10 +5,12 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <cassert>
 
 #include "vertex.h"
 #include "graph.h"
 #include "ringarea.h"
+#include "testcases.h"
 
 //global variables 
 Graph bilayer; 
@@ -295,8 +297,13 @@ int main(int argc, char *argv[])
   std::cout << "mu2 = " << secondmoment() << std::endl; 
   
   Hello(); 
+  float area; 
   for(unsigned int i = 0; i < allCycles.size(); i++)
-    ringArea(allCycles[i]); 
+    area=ringArea(allCycles[i]); 
+  std::cout << area - 4.41 << std::endl; 
+  assert( abs(area - 4.41) < 1e-6); 
+
+  testSquare(); 
 
   return 0; 
 }//main()
