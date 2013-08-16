@@ -277,7 +277,10 @@ int main(int argc, char *argv[])
   string out = "honeycomb1.m";
 
   read_xyz(argv[1],bilayer);
-  connectAtoms(bilayer,2.2);
+  std::cout << "Making Connections" << std::endl; 
+  connectAtoms(bilayer,1.1);
+  
+  std::cout << "Making output" << std::endl; 
 
   //bilayer.vertices[969]->AddEdge(bilayer.vertices[967]); //arbitrary connection  
   MakeHoney(bilayer); 
@@ -285,7 +288,7 @@ int main(int argc, char *argv[])
   //start counting cycles 
   for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
     bilayer.vertices[i]->CountCyclesLocally(allCycles); 
-  bilayer.FirstSort(allCycles); 
+  //  bilayer.FirstSort(allCycles); 
   AddRings(allCycles);
   std::cout << "Sorting through the Rings Now" << std::endl; 
   for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
@@ -297,13 +300,14 @@ int main(int argc, char *argv[])
   std::cout << "mu2 = " << secondmoment() << std::endl; 
   
   Hello(); 
-  float area; 
-  for(unsigned int i = 0; i < allCycles.size(); i++)
-    area=ringArea(allCycles[i]); 
-  std::cout << area - 4.41 << std::endl; 
-  assert( abs(area - 4.41) < 1e-6); 
+    float area; 
+    for(unsigned int i = 0; i < allCycles.size(); i++)
+      {
+	area=ringArea(allCycles[i]); 
+	std::cout << "area: " <<  area  << std::endl; 
+      }
 
-  testSquare(); 
+ 
 
   return 0; 
 }//main()

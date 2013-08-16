@@ -195,7 +195,7 @@ void Vertex::findCyclesToSelf(int maxCycleSize, std::vector<std::vector<Vertex*>
 void Vertex::CountCyclesLocally(std::vector<std::vector<Vertex*> >& allCycles)
 {
 
-  this->findCyclesToSelf(11, allCycles);
+  this->findCyclesToSelf(5, allCycles);
   
   for(unsigned int i = 0; i < allCycles.size(); i++) //Make sure cycle doesn't go back on itself                            {
     {
@@ -231,7 +231,7 @@ void Graph::CountCycles(std::vector<std::vector<Vertex*> >& allCycles)
   allCycles.clear(); //empty the cycleList
   for(unsigned int i = 0; i < vertices.size(); i++) //BFS to find itself 
     {
-      vertices[i]->findCyclesToSelf(10, allCycles);
+      vertices[i]->findCyclesToSelf(11, allCycles);
     }	
   for(unsigned int i = 0; i < allCycles.size(); i++) //Make sure cycle doesn't go back on itself 
     {
