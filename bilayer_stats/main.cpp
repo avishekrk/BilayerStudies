@@ -300,14 +300,14 @@ int main(int argc, char *argv[])
   std::cout << "mu2 = " << secondmoment() << std::endl; 
   
   Hello(); 
-    float area; 
+  float area; 
     for(unsigned int i = 0; i < allCycles.size(); i++)
       {
-	area=ringArea(allCycles[i]); 
-	std::cout << "area: " <<  area  << std::endl; 
+	area += ringArea(allCycles[i]); 
+	
       }
-
- 
-
-  return 0; 
+    
+    std::cout << "area: " <<  area  << std::endl; 
+    
+    return 0; 
 }//main()

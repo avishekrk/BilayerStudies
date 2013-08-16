@@ -1,6 +1,7 @@
 //ringarea.cpp 
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 #include "vertex.h"
 #include "ringarea.h"
@@ -24,7 +25,7 @@ std::vector<Vertex*> ringSort(std::vector<Vertex*> &ring,bool Debug=false)
 {
   std::vector<Vertex*> cycle = ring; 
   std::vector<Vertex*> sorted;
-
+  unsigned int n = cycle.size(); 
 
   if(Debug)
     {
@@ -43,8 +44,9 @@ std::vector<Vertex*> ringSort(std::vector<Vertex*> &ring,bool Debug=false)
   
 
   sorted.push_back(cycle[0]); 
+  cycle.erase(cycle.begin());
   bool Match = false; 
-  while(sorted.size() != cycle.size())
+  while(sorted.size() != n)
     {
       for(unsigned int i = 0; i < sorted.back()->edges.size(); i++)
 	{
@@ -55,6 +57,7 @@ std::vector<Vertex*> ringSort(std::vector<Vertex*> &ring,bool Debug=false)
 		{
 		  std::cout << "Found a Match" << std::endl; 
 		  sorted.push_back(cycle[j]); 
+		  cycle.erase(cycle.begin()+j); 
 		  Match = true; 
 		  break; 
 		}//if 
@@ -65,27 +68,13 @@ std::vector<Vertex*> ringSort(std::vector<Vertex*> &ring,bool Debug=false)
     }//while loop 
 
 
-  for(unsigned int i = 0; i < cycle[0]->edges.size(); i++)
-    {
-      bool Match=false;
-      for(unsigned int j = 0; j < cycle.size(); j++)
-	if (cycle[0]->edges[i] == cycle[j])
-	  {
-	    std::cout << "Found a Match" << std::endl;
-	    sorted.push_back(cycle[j]); 
-	    Match = true;
-	    break; 
-	  }
-      if(Match)
-	break; 
-    }
   
   std::cout<< "Sorted List" << std::endl; 
   for(unsigned int i = 0; i < sorted.size(); i++)
     std::cout << sorted[i]->x << " " << sorted[i]->y << std::endl; 
 
 
-  return cycle; 
+  return sorted; 
 
 }//sortRing()
 
@@ -135,5 +124,5 @@ float ringArea(std::vector<Vertex*>  &ring_unsorted)
   delete [] x; 
   delete [] y; 
    
-  return area; 
+  return abs(area); 
 }
