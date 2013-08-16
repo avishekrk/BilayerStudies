@@ -40,7 +40,31 @@ std::vector<Vertex*> ringSort(std::vector<Vertex*> &ring,bool Debug=false)
     }//end Debug 
   
 
+  
+
   sorted.push_back(cycle[0]); 
+  bool Match = false; 
+  while(sorted.size() != cycle.size())
+    {
+      for(unsigned int i = 0; i < sorted.back()->edges.size(); i++)
+	{
+	  Match = false; 
+	  for(unsigned int j = 0; j < cycle.size(); j++)
+	    {
+	      if(sorted.back()->edges[i] == cycle[j])
+		{
+		  std::cout << "Found a Match" << std::endl; 
+		  sorted.push_back(cycle[j]); 
+		  Match = true; 
+		  break; 
+		}//if 
+	    }
+	  if(Match)
+	    break; 
+	}//i loop 
+    }//while loop 
+
+
   for(unsigned int i = 0; i < cycle[0]->edges.size(); i++)
     {
       bool Match=false;
