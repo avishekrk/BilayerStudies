@@ -55,7 +55,7 @@ std::vector<Vertex*> ringSort(std::vector<Vertex*> &ring,bool Debug=false)
 	    {
 	      if(sorted.back()->edges[i] == cycle[j])
 		{
-		  std::cout << "Found a Match" << std::endl; 
+		  if(Debug) std::cout << "Found a Match" << std::endl; 
 		  sorted.push_back(cycle[j]); 
 		  cycle.erase(cycle.begin()+j); 
 		  Match = true; 
@@ -68,11 +68,12 @@ std::vector<Vertex*> ringSort(std::vector<Vertex*> &ring,bool Debug=false)
     }//while loop 
 
 
-  
-  std::cout<< "Sorted List" << std::endl; 
-  for(unsigned int i = 0; i < sorted.size(); i++)
-    std::cout << sorted[i]->x << " " << sorted[i]->y << std::endl; 
-
+  if (Debug)
+    {
+      std::cout<< "Sorted List" << std::endl; 
+      for(unsigned int i = 0; i < sorted.size(); i++)
+	std::cout << sorted[i]->x << " " << sorted[i]->y << std::endl; 
+    }
 
   return sorted; 
 
@@ -81,19 +82,20 @@ std::vector<Vertex*> ringSort(std::vector<Vertex*> &ring,bool Debug=false)
 /*
   ringArea, calculated the area of of convex polygon 
  */
-float ringArea(std::vector<Vertex*>  &ring_unsorted)
+float ringArea(std::vector<Vertex*>  &ring_unsorted, bool Debug)
 {
 
-  std::vector <Vertex*> ring = ringSort(ring_unsorted,true); 
+  std::vector <Vertex*> ring = ringSort(ring_unsorted,Debug); 
 
   unsigned int n = ring.size() + 1; 
   float *x = new float [n];
   float *y = new float [n]; 
   float area; 
 
+  
   for(unsigned int i = 0; i < ring.size(); i++)
     {
-      std::cout << "x= " << ring[i]->x << " y= " << ring[i]->y << std::endl; 
+      if (Debug) std::cout << "x= " << ring[i]->x << " y= " << ring[i]->y << std::endl; 
       x[i] = ring[i]->x; 
       y[i] = ring[i]->y;
     }//i loop 
@@ -101,14 +103,16 @@ float ringArea(std::vector<Vertex*>  &ring_unsorted)
   x[n-1] = ring[0]->x; 
   y[n-1] = ring[0]->y;
   
-  std::cout << "Printing from array" << std::endl; 
+  
   
   //Calculate determinent for the area
   
-
-  for(unsigned int i = 0; i < n; i++)
-    std::cout << x[i] << " " << y[i] << std::endl; 
-  
+  if(Debug)
+    {
+      std::cout << "Printing from array" << std::endl; 
+      for(unsigned int i = 0; i < n; i++)
+	std::cout << x[i] << " " << y[i] << std::endl; 
+    }
   double a=0,b=0; 
 
   for(unsigned int i = 0; i < n-1; i++)
@@ -119,7 +123,7 @@ float ringArea(std::vector<Vertex*>  &ring_unsorted)
 
   area = (a-b)*0.5; 
 
-  std::cout << "Area is " << area << std::endl; 
+  if(Debug) std::cout << "Area is " << area << std::endl; 
 
   delete [] x; 
   delete [] y; 
