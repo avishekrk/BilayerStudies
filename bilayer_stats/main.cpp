@@ -278,11 +278,11 @@ int main(int argc, char *argv[])
 
   read_xyz(argv[1],bilayer);
   std::cout << "Making Connections" << std::endl; 
-  connectAtoms(bilayer,1.1);
+  connectAtoms(bilayer,2.1);
   
   std::cout << "Making output" << std::endl; 
 
-  //bilayer.vertices[969]->AddEdge(bilayer.vertices[967]); //arbitrary connection  
+  bilayer.vertices[969]->AddEdge(bilayer.vertices[967]); //arbitrary connection  
   MakeHoney(bilayer); 
 
   //start counting cycles 
