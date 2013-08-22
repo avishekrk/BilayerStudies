@@ -370,8 +370,11 @@ int main(int argc, char *argv[])
       }
 
     polygonGraphics(sortedCycles); 
-    
+    float bndlength = avgbnd_length(bilayer); 
+
     std::cout << "area: " <<  area  << std::endl; 
+    std::cout << "average bond length " << avgbnd_length(bilayer) << std::endl; 
+    std::cout << "area/avg bond length " << area/( bndlength*bndlength ) << std::endl; 
     
     return 0; 
 }//main()

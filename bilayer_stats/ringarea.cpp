@@ -131,3 +131,30 @@ float ringArea(std::vector<Vertex*>  &ring_unsorted, bool Debug)
    
   return abs(area); 
 }
+
+
+/*
+  Calculates the average bond length of all the bonds. 
+ */
+float avgbnd_length(Graph &bilayer)
+{
+  float bnd_length=0; 
+  int nbonds = 0; 
+  float xij,yij,zij,r;
+
+  for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
+    {
+      for(unsigned int j = 0; j < bilayer.vertices[i]->edges.size(); j++)
+	{
+	  xij = bilayer.vertices[i]->x - bilayer.vertices[i]->edges[j]->x;
+	  yij = bilayer.vertices[i]->y - bilayer.vertices[i]->edges[j]->y;
+	  zij = bilayer.vertices[i]->z - bilayer.vertices[i]->edges[j]->z;
+	  r = sqrt( xij*xij + yij*yij + zij*zij );
+	  bnd_length += r; 
+	  nbonds += 1; 
+	  
+	}//j loop over the edges of the ith vertex 
+    }//i loop over the vertices 
+
+  return bnd_length/((float)nbonds); 
+}//avgbnd_length 
