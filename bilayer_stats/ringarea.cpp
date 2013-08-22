@@ -21,7 +21,7 @@ void Hello()
   @param, ring, n vector of Vertex*
   @return, sring, sorted ring
  */
-std::vector<Vertex*> ringSort(std::vector<Vertex*> &ring,bool Debug=false)
+std::vector<Vertex*> ringSort(std::vector<Vertex*> &ring,bool Debug)
 {
   std::vector<Vertex*> cycle = ring; 
   std::vector<Vertex*> sorted;
@@ -80,7 +80,8 @@ std::vector<Vertex*> ringSort(std::vector<Vertex*> &ring,bool Debug=false)
 }//sortRing()
 
 /*
-  ringArea, calculated the area of of convex polygon 
+  ringArea, calculated the area of of convex polygon and return a
+  sorted ring list 
  */
 float ringArea(std::vector<Vertex*>  &ring_unsorted, bool Debug)
 {

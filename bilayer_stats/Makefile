@@ -1,5 +1,5 @@
 C++ = g++
-FLAGS = -ansi -pedantic -W -Wall -Wextra 
+FLAGS = -ansi -pedantic -W -Wall -Wextra -g  
 .PHONY: clean 
 
 main.e: main.o vertex.o graph.o ringarea.o testcases.o  

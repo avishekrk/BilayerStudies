@@ -15,6 +15,7 @@
 //global variables 
 Graph bilayer; 
 std::vector<std::vector<Vertex*> > allCycles;
+std::vector<std::vector<Vertex*> > sortedCycles; 
 const int ringmax = 12; 
 int countBucket[ringmax];
 std::vector<std::vector<int> > stack; 
@@ -189,6 +190,65 @@ void cycleDump(std::vector <std::vector<Vertex*> > &allCycles)
   fclose(cycle);
 }//cycleDump()
 
+void polygonGraphics(std::vector <std::vector<Vertex*> > &allCycles)
+{
+  unsigned int minRing = 4; 
+  unsigned int maxRing = 10; 
+
+  const char *colors[11];
+  colors[4]="Blue";
+  colors[5]="Black";
+  colors[6]="Yellow";
+  colors[7]="Green";
+  colors[8]="Red";
+  colors[9]="Purple";
+  colors[10]="Cyan";
+
+  FILE* poly; 
+  poly = fopen("poly.m", "w"); 
+  fprintf(poly, "Graphics[{\n"); 
+  fprintf(poly, "EdgeForm[Thick]\n"); 
+  bool first;
+
+  while( minRing <= maxRing )
+    {
+      first=true;
+      fprintf(poly,","); 
+      fprintf(poly,colors[minRing]);
+      fprintf(poly,",\n"); 
+      
+      fprintf(poly, "Polygon[{\n"); 
+      for(unsigned int i = 0; i < allCycles.size(); i++)
+	{
+	  if ( allCycles[i].size() != minRing ) continue; 
+
+	  if (first)
+	    {
+	      fprintf(poly," ");
+	      first=false;
+	    }
+	  else
+	    {
+	      fprintf(poly,","); 
+	    }
+	  fprintf(poly,"{ "); 
+	  for(unsigned int j = 0; j < allCycles[i].size(); j++)
+	    {
+	      if ( j != 0)
+		fprintf(poly,","); 
+	      fprintf(poly, "{%f,%f}",allCycles[i][j]->x, allCycles[i][j]->y); 
+	    }//j loop over vertices in cycle
+	  fprintf(poly, "}\n"); 
+	}//i loop over cycle
+      fprintf(poly, "}]\n");//closes up Polygon
+      minRing += 1; 
+    }//for color of rings 
+
+  fprintf(poly, "}]\n");//closes of Graphics
+
+  fclose(poly); 
+}//PolygonGraphics()
+
 
 /*
   AddRings to vertices. Good for looking for superrings,
@@ -299,13 +359,16 @@ int main(int argc, char *argv[])
   cycleDump(allCycles); 
   std::cout << "mu2 = " << secondmoment() << std::endl; 
   
-  Hello(); 
+
+  
   float area; 
     for(unsigned int i = 0; i < allCycles.size(); i++)
       {
 	area += ringArea(allCycles[i]); 
-	
+	sortedCycles.push_back(ringSort(allCycles[i]));
       }
+
+    polygonGraphics(sortedCycles); 
     
     std::cout << "area: " <<  area  << std::endl; 
     
