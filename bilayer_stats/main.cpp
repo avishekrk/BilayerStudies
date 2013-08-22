@@ -245,6 +245,7 @@ void polygonGraphics(std::vector <std::vector<Vertex*> > &allCycles)
     }//for color of rings 
 
   fprintf(poly, "}]\n");//closes of Graphics
+  fprintf(poly, "Export[\"poly.pdf\",%]"); 
 
   fclose(poly); 
 }//PolygonGraphics()
