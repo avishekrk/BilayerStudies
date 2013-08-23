@@ -18,6 +18,7 @@ std::vector<std::vector<Vertex*> > allCycles;
 std::vector<std::vector<Vertex*> > sortedCycles; 
 const int ringmax = 12; 
 int countBucket[ringmax];
+float areaBucket[ringmax]; 
 std::vector<std::vector<int> > stack; 
 
 /*
@@ -365,16 +366,24 @@ int main(int argc, char *argv[])
   float area; 
     for(unsigned int i = 0; i < allCycles.size(); i++)
       {
-	area += ringArea(allCycles[i]); 
+	area += ringArea(allCycles[i],areaBucket,ringmax); 
 	sortedCycles.push_back(ringSort(allCycles[i]));
       }
 
     polygonGraphics(sortedCycles); 
     float bndlength = avgbnd_length(bilayer); 
 
+    float areasum = 0.; 
+
+    for(int i = 0; i < ringmax; i++)
+      areasum += areaBucket[i]; 
+
     std::cout << "area: " <<  area  << std::endl; 
+    std::cout << "average of area bucket " << std::endl; 
     std::cout << "average bond length " << avgbnd_length(bilayer) << std::endl; 
-    std::cout << "area/avg bond length " << area/( bndlength*bndlength ) << std::endl; 
+    std::cout << "area/avgbondlength*2 " << area/( bndlength*bndlength ) << std::endl; 
     
+
+
     return 0; 
 }//main()

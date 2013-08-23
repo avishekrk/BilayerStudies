@@ -83,9 +83,11 @@ std::vector<Vertex*> ringSort(std::vector<Vertex*> &ring,bool Debug)
   ringArea, calculated the area of of convex polygon and return a
   sorted ring list 
  */
-float ringArea(std::vector<Vertex*>  &ring_unsorted, bool Debug)
+float ringArea(std::vector<Vertex*>  &ring_unsorted, float areaBucket[], int ringmax, bool Debug)
 {
 
+  for(int i = 0; i < ringmax; i++) areaBucket[i] = 0; 
+  
   std::vector <Vertex*> ring = ringSort(ring_unsorted,Debug); 
 
   unsigned int n = ring.size() + 1; 
@@ -123,6 +125,7 @@ float ringArea(std::vector<Vertex*>  &ring_unsorted, bool Debug)
     }
 
   area = (a-b)*0.5; 
+  areaBucket[n-1] += area; 
 
   if(Debug) std::cout << "Area is " << area << std::endl; 
 
