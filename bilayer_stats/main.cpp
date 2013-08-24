@@ -327,6 +327,34 @@ float secondmoment()
 
 }//secondmoment()
 
+void ringstatsOut(int countBucket[], string nfile ="ringhist.dat")
+{
+  FILE *out; 
+
+  out = fopen(nfile.c_str(),"w"); 
+
+  fprintf(out,"%f\n",secondmoment()); 
+  for(int i = 4; i < ringmax; i++)
+    fprintf(out,"%d %d\n",i,countBucket[i]); 
+
+  fclose(out); 
+}//ringstatsOut()
+
+void areastatsOut(float areaBucket[], float areabndlength, string nfile="areahist.dat")
+{
+  FILE *out; 
+  
+  out = fopen(nfile.c_str(),"w");
+  
+  fprintf(out,"%f\n",areabndlength);
+  for(int i = 4; i < ringmax; i++)
+    fprintf(out,"%d %f\n",i,areaBucket[i]); 
+
+  fclose(out); 
+  
+}//areastatsOut()
+
+//ringstatsOut
 int main(int argc, char *argv[])
 {
   
@@ -360,11 +388,14 @@ int main(int argc, char *argv[])
   fillCountBucket(countBucket,allCycles); 
   cycleDump(allCycles); 
   std::cout << "mu2 = " << secondmoment() << std::endl; 
-  
-
+    
   
   float area; 
-    for(unsigned int i = 0; i < allCycles.size(); i++)
+  
+  for(int i = 0; i < ringmax; i++) areaBucket[i] = 0.0; 
+
+
+  for(unsigned int i = 0; i < allCycles.size(); i++)
       {
 	area += ringArea(allCycles[i],areaBucket,ringmax); 
 	sortedCycles.push_back(ringSort(allCycles[i]));
@@ -379,11 +410,15 @@ int main(int argc, char *argv[])
       areasum += areaBucket[i]; 
 
     std::cout << "area: " <<  area  << std::endl; 
-    std::cout << "average of area bucket " << std::endl; 
+    std::cout << "average of area bucket " << areasum << std::endl; 
     std::cout << "average bond length " << avgbnd_length(bilayer) << std::endl; 
     std::cout << "area/avgbondlength*2 " << area/( bndlength*bndlength ) << std::endl; 
     
+    for(int i = 0; i < ringmax; i++)
+      areaBucket[i] /= bndlength*bndlength;
 
+    ringstatsOut(countBucket); 
+    areastatsOut(areaBucket,area/(bndlength*bndlength)); 
 
     return 0; 
 }//main()

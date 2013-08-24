@@ -86,7 +86,7 @@ std::vector<Vertex*> ringSort(std::vector<Vertex*> &ring,bool Debug)
 float ringArea(std::vector<Vertex*>  &ring_unsorted, float areaBucket[], int ringmax, bool Debug)
 {
 
-  for(int i = 0; i < ringmax; i++) areaBucket[i] = 0; 
+
   
   std::vector <Vertex*> ring = ringSort(ring_unsorted,Debug); 
 
@@ -125,7 +125,7 @@ float ringArea(std::vector<Vertex*>  &ring_unsorted, float areaBucket[], int rin
     }
 
   area = (a-b)*0.5; 
-  areaBucket[n-1] += area; 
+  areaBucket[n-1] += abs(area); 
 
   if(Debug) std::cout << "Area is " << area << std::endl; 
 
