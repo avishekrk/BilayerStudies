@@ -215,7 +215,7 @@ void polygonGraphics(std::vector <std::vector<Vertex*> > &allCycles)
     {
       first=true;
       fprintf(poly,","); 
-      fprintf(poly,colors[minRing]);
+      fprintf(poly,"%s",colors[minRing]);
       fprintf(poly,",\n"); 
       
       fprintf(poly, "Polygon[{\n"); 
@@ -246,7 +246,7 @@ void polygonGraphics(std::vector <std::vector<Vertex*> > &allCycles)
     }//for color of rings 
 
   fprintf(poly, "}]\n");//closes of Graphics
-  fprintf(poly, "Export[\"poly.pdf\",%]"); 
+  fprintf(poly, "Export[\"poly.pdf\",%%]"); 
 
   fclose(poly); 
 }//PolygonGraphics()
@@ -397,7 +397,7 @@ int main(int argc, char *argv[])
 
   for(unsigned int i = 0; i < allCycles.size(); i++)
       {
-	area += ringArea(allCycles[i],areaBucket,ringmax); 
+	area += ringArea(allCycles[i],areaBucket); 
 	sortedCycles.push_back(ringSort(allCycles[i]));
       }
 
