@@ -141,16 +141,14 @@ void fillCountBucket(int countBucket[], std::vector <std::vector<Vertex*> > &all
   stack.push_back(list);
   list.clear();
   
-  // std::cout << "Rings Statistics" << std::endl;                                                                                                                                                                                                                                
-  // for(int i =0; i < 12; i++) std::cout << i << " rings: " << countBucket[i] << std::endl;                                                                                                                                                                                      
+
   int ring_sum =0;
   for(int i =0; i < 12; i++) { ring_sum += i*countBucket[i];}
   int sum =0;
   for(int i = 0; i < 12; i++){sum += countBucket[i];}
-  //std::cout << "RING SUM " << ring_sum << std::endl;                                                                                                                                                                                                                            
-  //std::cout << "SUM " << sum << std::endl;                                                                                                                                                                                                                                      
+
   double average = (double) ring_sum/sum;
-  //std::cout << "AVERAGE " << average << std::endl;                                                                                                                                                                                                                                
+
   FILE* count;
   
   count = fopen( "countBucket.dat", "w");
