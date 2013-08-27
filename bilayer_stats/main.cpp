@@ -431,7 +431,6 @@ int main(int argc, char *argv[])
   
   float bondlength; 
   string basename; 
-  float area; 
   float areasum = 0.; 
   float bndlength; 
 
@@ -466,12 +465,17 @@ int main(int argc, char *argv[])
   
    
   for(int i = 0; i < ringmax; i++) areaBucket[i] = 0.0; 
+  
+  FILE *ring; 
+  string ext = "_ringdist.dat";
+  ring = fopen((basename+ext).c_str(),"w"); 
   for(unsigned int i = 0; i < allCycles.size(); i++)
       {
-	area += ringArea(allCycles[i],areaBucket); 
+	fprintf(ring,"%d %f\n",allCycles[i].size(), ringArea(allCycles[i],areaBucket) ); 
 	sortedCycles.push_back(ringSort(allCycles[i]));
       }
-
+  fclose(ring); 
+  
   polygonGraphics(sortedCycles,basename); 
   bndlength = avgbnd_length(bilayer); 
   
@@ -480,16 +484,16 @@ int main(int argc, char *argv[])
   for(int i = 0; i < ringmax; i++)
     areasum += areaBucket[i]; 
   
-  std::cout << "area: " <<  area  << std::endl; 
-  std::cout << "average of area bucket " << areasum << std::endl; 
+  
+  std::cout << "sum of area bucket " << areasum << std::endl; 
   std::cout << "average bond length " << avgbnd_length(bilayer) << std::endl; 
-  std::cout << "area/avgbondlength*2 " << area/( bndlength*bndlength ) << std::endl; 
+  std::cout << "area/avgbondlength*2 " << areasum/( bndlength*bndlength ) << std::endl; 
   
   for(int i = 0; i < ringmax; i++)
     areaBucket[i] /= bndlength*bndlength;
   
   ringstatsOut(countBucket,basename); 
-  areastatsOut(areaBucket,area/(bndlength*bndlength),basename); 
+  areastatsOut(areaBucket,areasum/(bndlength*bndlength),basename); 
   
   return 0; 
 }//main()
