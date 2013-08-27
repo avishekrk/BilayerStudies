@@ -7,5 +7,6 @@
 void Hello(); 
 std::vector<Vertex*> ringSort(std::vector<Vertex*> &ring, bool Debug=false);
 float ringArea(std::vector<Vertex*>  &ring, float areaBucket[], bool Debug=false); 
+float calcarea(std::vector<Vertex*> &ring, bool Debug=false); 
 float avgbnd_length(Graph &bilayer);
  

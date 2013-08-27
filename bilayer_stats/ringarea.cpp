@@ -80,7 +80,7 @@ std::vector<Vertex*> ringSort(std::vector<Vertex*> &ring,bool Debug)
   Given a sorted list output is the area
  */
 
-float calcarea(std::vector<Vertex*> ring,bool Debug)
+float calcarea(std::vector<Vertex*> &ring,bool Debug)
 {
   float area; 
   unsigned int n = ring.size() + 1; 
@@ -115,8 +115,7 @@ float calcarea(std::vector<Vertex*> ring,bool Debug)
     }
 
   area = (a-b)*0.5; 
-  areaBucket[n-1] += abs(area); 
-
+  
   if(Debug) std::cout << "Area is " << area << std::endl; 
 
   delete [] x; 
@@ -134,50 +133,9 @@ float ringArea(std::vector<Vertex*>  &ring_unsorted, float areaBucket[], bool De
 {
   
   std::vector <Vertex*> ring = ringSort(ring_unsorted,Debug); 
-
-  unsigned int n = ring.size() + 1; 
-  float *x = new float [n];
-  float *y = new float [n]; 
-  float area; 
-
-  
-  for(unsigned int i = 0; i < ring.size(); i++)
-    {
-      if (Debug) std::cout << "x= " << ring[i]->x << " y= " << ring[i]->y << std::endl; 
-      x[i] = ring[i]->x; 
-      y[i] = ring[i]->y;
-    }//i loop 
-  
-  x[n-1] = ring[0]->x; 
-  y[n-1] = ring[0]->y;
-  
-  
-  
-  //Calculate determinent for the area
-  
-  if(Debug)
-    {
-      std::cout << "Printing from array" << std::endl; 
-      for(unsigned int i = 0; i < n; i++)
-	std::cout << x[i] << " " << y[i] << std::endl; 
-    }
-  double a=0,b=0; 
-
-  for(unsigned int i = 0; i < n-1; i++)
-    {
-      a += x[i]*y[i+1];
-      b += y[i]*x[i+1]; 
-    }
-
-  area = (a-b)*0.5; 
-  areaBucket[n-1] += abs(area); 
-
-  if(Debug) std::cout << "Area is " << area << std::endl; 
-
-  delete [] x; 
-  delete [] y; 
-   
-  return abs(area); 
+  float area = calcarea(ring); 
+  areaBucket[ring.size()] += area; 
+  return area; 
 }
 
 
