@@ -343,7 +343,6 @@ void areastatsOut(float areaBucket[], float areabndlength, string nfile="areahis
   FILE *out; 
   
   out = fopen(nfile.c_str(),"w");
-  
   fprintf(out,"%f\n",areabndlength);
   for(int i = 4; i < ringmax; i++)
     fprintf(out,"%d %f\n",i,areaBucket[i]); 
