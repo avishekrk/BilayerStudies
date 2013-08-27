@@ -11,6 +11,7 @@
 #include "graph.h"
 #include "ringarea.h"
 #include "testcases.h"
+#include "tinyxml2.h"
 
 //global variables 
 Graph bilayer; 
@@ -68,6 +69,37 @@ void read_xyz(char *file, Graph &bilayer,bool Debug=false)
   
 }//read_xyz()
 
+void read_connect(char *file, Graph &bilayer)
+{
+  FILE *in; 
+  int i,j,nconnect, nconcount=0; 
+
+  in = fopen(file,"r"); 
+  if( NULL == in )
+    {
+      std::cerr << "Cannot open file: " << file << std::endl; 
+      exit(1); 
+    }
+  fscanf(in,"%d",&nconnect); 
+  std::cout << "Number of manual connections: " << nconnect << std::endl; 
+
+  while( 2 == fscanf(in,"%d %d\n",&i,&j) )
+    {
+      std::cout << "Making connection between i: " << i << " and j: " << j << std::endl; 
+      bilayer.vertices[i]->AddEdge(bilayer.vertices[j]); 
+      nconcount++; 
+    }
+  fclose(in); 
+
+  if( nconnect != nconcount)
+    {
+      std::cerr << "The number of connections: " << nconnect << " . Does not match the number read: " << nconcount << std::endl;
+      exit(1); 
+    }
+
+
+}//read_connect()
+
 
 /*
   Connect atoms within a certain distance 
@@ -107,10 +139,15 @@ void connectAtoms(Graph &bilayer,float dist,int Debug=0)
   @param bilayer, Graph object containing vertices 
   @param nfile, array of characters for name of output file
  */
-void MakeHoney(Graph& bilayer, string nfile="honeycomb1.m")
+void MakeHoney(Graph& bilayer, string nfile="bilayer")
 {
   FILE *outFile; 
-  outFile = fopen(nfile.c_str() , "w");
+  string extm="_structure.m"; 
+  string extpdf = "_structure.pdf";
+  string file = nfile + extm; 
+  outFile = fopen(file.c_str(), "w");
+
+
   fprintf(outFile, "Graphics[{Black");
 
 
@@ -128,11 +165,18 @@ void MakeHoney(Graph& bilayer, string nfile="honeycomb1.m")
     }
 
   fprintf(outFile, "\n}]");
+  fprintf(outFile,"\nExport[\"%s\",%%]",(nfile+extpdf).c_str()); 
   fclose(outFile);
 }
 
-void fillCountBucket(int countBucket[], std::vector <std::vector<Vertex*> > &allCycles)
+
+
+void fillCountBucket(int countBucket[], std::vector <std::vector<Vertex*> > &allCycles,string nfile="bilayer")
 {
+
+  string extdat ="_ringCount.dat"; 
+  string file = nfile + extdat; 
+  
   std::vector <int> list;
   for(unsigned int i =0; i<12; i++) countBucket[i] =0;
   for(unsigned int i =0; i<allCycles.size(); i++) countBucket[allCycles[i].size()]++;
@@ -151,7 +195,7 @@ void fillCountBucket(int countBucket[], std::vector <std::vector<Vertex*> > &all
 
   FILE* count;
   
-  count = fopen( "countBucket.dat", "w");
+  count = fopen(file.c_str(), "w");
   fprintf(count, "Ring Statistics\n");
   for(int i =0; i < 12; i++) fprintf(count, "%d RINGS: %d\n", i, countBucket[i]);
   fprintf(count, "RING SUM: %d\n",ring_sum);
@@ -189,8 +233,13 @@ void cycleDump(std::vector <std::vector<Vertex*> > &allCycles)
   fclose(cycle);
 }//cycleDump()
 
-void polygonGraphics(std::vector <std::vector<Vertex*> > &allCycles)
+void polygonGraphics(std::vector <std::vector<Vertex*> > &allCycles, string nfile="bilayer")
 {
+  string ext ="_poly.m";
+  string extpdf="_poly.pdf"; 
+  string file = nfile+ext; 
+   
+
   unsigned int minRing = 4; 
   unsigned int maxRing = 10; 
 
@@ -204,7 +253,7 @@ void polygonGraphics(std::vector <std::vector<Vertex*> > &allCycles)
   colors[10]="Cyan";
 
   FILE* poly; 
-  poly = fopen("poly.m", "w"); 
+  poly = fopen(file.c_str(), "w"); 
   fprintf(poly, "Graphics[{\n"); 
   fprintf(poly, "EdgeForm[Thick]\n"); 
   bool first;
@@ -244,7 +293,7 @@ void polygonGraphics(std::vector <std::vector<Vertex*> > &allCycles)
     }//for color of rings 
 
   fprintf(poly, "}]\n");//closes of Graphics
-  fprintf(poly, "Export[\"poly.pdf\",%%]"); 
+  fprintf(poly, "Export[\"%s\",%%]",(nfile+extpdf).c_str()); 
 
   fclose(poly); 
 }//PolygonGraphics()
@@ -325,11 +374,14 @@ float secondmoment()
 
 }//secondmoment()
 
-void ringstatsOut(int countBucket[], string nfile ="ringhist.dat")
+void ringstatsOut(int countBucket[], string nfile ="bilayer")
 {
+  string ext = "_ringhist.dat"; 
+  string file = nfile+ext; 
+    
   FILE *out; 
 
-  out = fopen(nfile.c_str(),"w"); 
+  out = fopen(file.c_str(),"w"); 
 
   fprintf(out,"%f\n",secondmoment()); 
   for(int i = 4; i < ringmax; i++)
@@ -338,11 +390,14 @@ void ringstatsOut(int countBucket[], string nfile ="ringhist.dat")
   fclose(out); 
 }//ringstatsOut()
 
-void areastatsOut(float areaBucket[], float areabndlength, string nfile="areahist.dat")
+void areastatsOut(float areaBucket[], float areabndlength, string nfile="bilayer")
 {
+
+  string ext ="_areahist.dat";
+  string file = nfile+ext; 
   FILE *out; 
   
-  out = fopen(nfile.c_str(),"w");
+  out = fopen(file.c_str(),"w");
   fprintf(out,"%f\n",areabndlength);
   for(int i = 4; i < ringmax; i++)
     fprintf(out,"%d %f\n",i,areaBucket[i]); 
@@ -351,71 +406,90 @@ void areastatsOut(float areaBucket[], float areabndlength, string nfile="areahis
   
 }//areastatsOut()
 
+void readParameters(char *nfile,float &bondlength, string &basename)
+{
+  tinyxml2::XMLDocument doc; 
+  doc.LoadFile(nfile); 
+
+  bondlength = atof( doc.FirstChildElement("root")->FirstChildElement("bondlength")->GetText() );
+  basename = doc.FirstChildElement("root")->FirstChildElement("basename")->GetText(); 
+
+  std::cout << "bondlength: " << bondlength << std::endl; 
+  std::cout << "basename: " << basename << std::endl; 
+
+}//readParameters()
+
 //ringstatsOut
 int main(int argc, char *argv[])
 {
   
-  if ( argc < 2 )
+  if ( argc < 3 )
     {
       std::cerr << "Not enough input arguments: " << argc << std::endl; 
       exit(1);  
     }
   
+  float bondlength; 
+  string basename; 
+  float area; 
+  float areasum = 0.; 
+  float bndlength; 
+
+
   string out = "honeycomb1.m";
 
   read_xyz(argv[1],bilayer);
-  std::cout << "Making Connections" << std::endl; 
-  connectAtoms(bilayer,2.1);
-  
-  std::cout << "Making output" << std::endl; 
+  readParameters(argv[2],bondlength,basename); 
 
-  bilayer.vertices[969]->AddEdge(bilayer.vertices[967]); //arbitrary connection  
-  MakeHoney(bilayer); 
+  std::cout << "Making Connections Based On Distance" << std::endl; 
+  connectAtoms(bilayer,bondlength);
+  
+  std::cout << "Making manual connections" << std::endl; 
+  read_connect(argv[3],bilayer); 
+  MakeHoney(bilayer,basename); 
+
+
 
   //start counting cycles 
   for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
     bilayer.vertices[i]->CountCyclesLocally(allCycles); 
-  //  bilayer.FirstSort(allCycles); 
   AddRings(allCycles);
   std::cout << "Sorting through the Rings Now" << std::endl; 
   for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
     secondSort(bilayer,allCycles,i); 
 
   //Ring Statistics 
-  fillCountBucket(countBucket,allCycles); 
+  fillCountBucket(countBucket,allCycles,basename); 
   cycleDump(allCycles); 
   std::cout << "mu2 = " << secondmoment() << std::endl; 
     
   
-  float area; 
-  
+   
   for(int i = 0; i < ringmax; i++) areaBucket[i] = 0.0; 
-
-
   for(unsigned int i = 0; i < allCycles.size(); i++)
       {
 	area += ringArea(allCycles[i],areaBucket); 
 	sortedCycles.push_back(ringSort(allCycles[i]));
       }
 
-    polygonGraphics(sortedCycles); 
-    float bndlength = avgbnd_length(bilayer); 
-
-    float areasum = 0.; 
-
-    for(int i = 0; i < ringmax; i++)
-      areasum += areaBucket[i]; 
-
-    std::cout << "area: " <<  area  << std::endl; 
-    std::cout << "average of area bucket " << areasum << std::endl; 
-    std::cout << "average bond length " << avgbnd_length(bilayer) << std::endl; 
-    std::cout << "area/avgbondlength*2 " << area/( bndlength*bndlength ) << std::endl; 
+  polygonGraphics(sortedCycles,basename); 
+  bndlength = avgbnd_length(bilayer); 
+  
     
-    for(int i = 0; i < ringmax; i++)
-      areaBucket[i] /= bndlength*bndlength;
 
-    ringstatsOut(countBucket); 
-    areastatsOut(areaBucket,area/(bndlength*bndlength)); 
-
-    return 0; 
+  for(int i = 0; i < ringmax; i++)
+    areasum += areaBucket[i]; 
+  
+  std::cout << "area: " <<  area  << std::endl; 
+  std::cout << "average of area bucket " << areasum << std::endl; 
+  std::cout << "average bond length " << avgbnd_length(bilayer) << std::endl; 
+  std::cout << "area/avgbondlength*2 " << area/( bndlength*bndlength ) << std::endl; 
+  
+  for(int i = 0; i < ringmax; i++)
+    areaBucket[i] /= bndlength*bndlength;
+  
+  ringstatsOut(countBucket,basename); 
+  areastatsOut(areaBucket,area/(bndlength*bndlength),basename); 
+  
+  return 0; 
 }//main()

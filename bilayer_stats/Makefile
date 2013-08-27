@@ -1,9 +1,10 @@
 C++ = g++
-FLAGS = -ansi -pedantic -W -Wall -Wextra -g  
+OBJS = main.o vertex.o graph.o ringarea.o testcases.o tinyxml2.o
+FLAGS = -ansi -pedantic -W -Wall -Wextra   
 .PHONY: clean 
 
-main.e: main.o vertex.o graph.o ringarea.o testcases.o  
-	$(C++) $(FLAGS) main.o vertex.o graph.o ringarea.o testcases.o -o main.e 
+main.e: $(OBJS)
+	$(C++) $(FLAGS) $(OBJS) -o main.e 
 
 %.o : %.cpp
 	g++ -c $(FLAGS) $<
