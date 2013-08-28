@@ -72,6 +72,9 @@ def areahistogram():
     plt.show()
     plt.savefig("areahist.png")
 
+def makenringhistogram(ringsize,ringarea,ringsize):
+    
+
 def nringhistogram(nfile):
     """
     Produces a ring for a given size
@@ -91,3 +94,32 @@ def nringhistogram(nfile):
 
     print ringsize
     print ringarea 
+
+    #start making histogram
+    ringcount = 6
+    maxring = 6
+    nringarea = []
+
+    while(ringcount <= maxring):
+        for i in range(len(ringsize)):
+            if (ringsize[i] == ringcount):
+                nringarea.append(ringarea[i])
+        ringcount += 1
+
+    nringarea = np.array(nringarea)
+    hist,bins = np.histogram(nringarea,bins=10)
+    print hist
+    print "Sum of Hist: %f" %(np.sum(hist))
+    print bins
+    print bins[:-1]
+    width = 0.7*(bins[1]-bins[0])
+    center = (bins[:-1]+bins[1:])/2
+    plt.title("Histogram of 4 Rings")
+    plt.bar(center,hist,align='center',width=width)
+    plt.show()
+
+
+nringhistogram("cornell_A_ringdist.dat")
+
+
+    
