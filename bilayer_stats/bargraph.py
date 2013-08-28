@@ -71,3 +71,23 @@ def areahistogram():
                 ha='center', va='bottom')
     plt.show()
     plt.savefig("areahist.png")
+
+def nringhistogram(nfile):
+    """
+    Produces a ring for a given size
+    """
+    ringsize = []
+    ringarea = [] 
+    ring = open(nfile,"r")
+    
+    for line in ring:
+        ringsize.append( line.strip('\n').split()[0] )
+        ringarea.append( line.strip('\n').split()[1] )
+
+    ring.close()
+
+    ringsize = np.array(ringsize,dtype=int)
+    ringarea = np.array(ringarea,dtype=float)
+
+    print ringsize
+    print ringarea 
