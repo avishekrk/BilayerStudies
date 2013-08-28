@@ -72,8 +72,28 @@ def areahistogram():
     plt.show()
     plt.savefig("areahist.png")
 
-def makenringhistogram(ringsize,ringarea,ringsize):
+def makenringhistogram(ringsize,ringarea,ringcount):
     
+    basename="cornell_A "
+    nringarea = []
+    for i in range(len(ringsize)):
+        if (ringsize[i] == ringcount):
+            nringarea.append(ringarea[i])
+    
+    nringarea = np.array(nringarea)
+    hist,bins = np.histogram(nringarea,bins=10)
+    print hist
+    print "Sum of Hist: %f" %(np.sum(hist))
+    print bins
+    print bins[:-1]
+    width = 0.7*(bins[1]-bins[0])
+    center = (bins[:-1]+bins[1:])/2
+    
+    title2 = "%d rings"%ringcount
+    plt.title(basename + " " + title2)
+    plt.bar(center,hist,align='center',width=width)
+    plt.show()
+    plt.savefig("%d_ringhistogram.png"%ringcount)
 
 def nringhistogram(nfile):
     """
@@ -96,28 +116,12 @@ def nringhistogram(nfile):
     print ringarea 
 
     #start making histogram
-    ringcount = 6
+
+    ringcount = int(6)
     maxring = 6
-    nringarea = []
+    
 
-    while(ringcount <= maxring):
-        for i in range(len(ringsize)):
-            if (ringsize[i] == ringcount):
-                nringarea.append(ringarea[i])
-        ringcount += 1
-
-    nringarea = np.array(nringarea)
-    hist,bins = np.histogram(nringarea,bins=10)
-    print hist
-    print "Sum of Hist: %f" %(np.sum(hist))
-    print bins
-    print bins[:-1]
-    width = 0.7*(bins[1]-bins[0])
-    center = (bins[:-1]+bins[1:])/2
-    plt.title("Histogram of 4 Rings")
-    plt.bar(center,hist,align='center',width=width)
-    plt.show()
-
+    makenringhistogram(ringsize,ringarea,ringcount)
 
 nringhistogram("cornell_A_ringdist.dat")
 
