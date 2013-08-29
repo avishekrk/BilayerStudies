@@ -81,7 +81,11 @@ def makenringhistogram(ringsize,ringarea,ringcount):
             nringarea.append(ringarea[i])
     
     nringarea = np.array(nringarea)
-    hist,bins = np.histogram(nringarea,bins=10)
+    avg = np.mean(nringarea)
+    std = np.std(nringarea)
+    print "Average: %f" %avg
+    print "Std: %f" %std
+    hist,bins = np.histogram(nringarea,bins=50)
     print hist
     print "Sum of Hist: %f" %(np.sum(hist))
     print bins
@@ -89,11 +93,12 @@ def makenringhistogram(ringsize,ringarea,ringcount):
     width = 0.7*(bins[1]-bins[0])
     center = (bins[:-1]+bins[1:])/2
     
-    title2 = "%d rings"%ringcount
+    title2 = "%d rings $x= %f$;$\sigma= %f$"%(ringcount,avg,std)
     plt.title(basename + " " + title2)
     plt.bar(center,hist,align='center',width=width)
     plt.show()
-    plt.savefig("%d_ringhistogram.png"%ringcount)
+    plt.savefig(basename + "_%d_ringhistogram.png"%ringcount)
+    plt.clf()
 
 def nringhistogram(nfile):
     """
@@ -117,11 +122,10 @@ def nringhistogram(nfile):
 
     #start making histogram
 
-    ringcount = int(6)
+    ringcount = int(7)
     maxring = 6
-    
-
-    makenringhistogram(ringsize,ringarea,ringcount)
+    for i in range(4,12):
+        makenringhistogram(ringsize,ringarea,i)
 
 nringhistogram("cornell_A_ringdist.dat")
 
