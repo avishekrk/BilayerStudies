@@ -155,7 +155,7 @@ def ringareahistogram():
     areastats = np.array(areastats,dtype=float)
     width = 0.35
 
-    f, axarr = plt.subplots(2)
+    f, axarr = plt.subplots(3)
     rects1 = axarr[0].bar(ind+(0.35/2),ringstats,0.35,color='r')
     axarr[0].set_title("Ring Statistics, $\mu_{2} = $ %.2f" %(mu2))
     axarr[0].set_ylabel('Ring Count')
@@ -166,22 +166,50 @@ def ringareahistogram():
     axarr[1].set_title(r'Area per Ring $\frac{A}{<l>^{2}} = $ %.2f'%(area_length))
     axarr[1].set_ylabel(r'$\frac{A}{<l>^{2}}$')
     axarr[1].set_ylim(0,600)
-    axarr[1].set_xlabel('Ring Size')
-    axarr[1].set_xticks(ind+width)
-    axarr[1].set_xticklabels( ('4','5','6','7','8','9','10','11') )
     
+    axarr[1].set_xticks(ind+width)
+    axarr[1].set_xticklabels( ('','','','','','','','') )
+    areaPerRing = (areastats/ringstats)
+    areaPerRing[np.isnan(areaPerRing)] = 0 
+    print "areaPerRing"
+    print areaPerRing
+    rects3 = axarr[2].bar(ind+(0.35/2),areaPerRing,0.35,color='b')
+    axarr[2].set_title('Average Area per Ring')
+    axarr[2].set_ylabel(r'$\frac{A}{<l>^{2}N_{r}}$')
+    axarr[2].set_ylim(0,10)
+    axarr[2].set_xticks(ind+width)
+    axarr[2].set_xticklabels( ('4','5','6','7','8','9','10','11') )
+    axarr[2].set_xlabel('Ring Size')
 
     for rect in rects1:
         height = rect.get_height()
         axarr[0].text(rect.get_x()+rect.get_width()/2., 1.025*height, '%d'%int(height),
-                      ha='center', va='bottom')
+                    ha='center', va='bottom')
+
     for rect in rects2:
         height = rect.get_height()
         axarr[1].text(rect.get_x()+rect.get_width()/2., 1.025*height, '%.2f'%float(height),
                       ha='center', va='bottom')
+
+
+    for rect in rects3:
+        height = rect.get_height()
+        axarr[2].text(rect.get_x()+rect.get_width()/2., 1.025*height, '%.2f'%float(height),
+                      ha='center', va='bottom')
+
     
     plt.show()
     plt.savefig("cornell_A_stats.png")
+    plt.clf()
+    
+    #Lewis Plot
+    plt.plot(range(4,12),areaPerRing,'ko')
+    plt.title("Lewis's Law Cornell A Sample")
+    plt.xlabel("Ring Size, $r$")
+    plt.ylabel(r'Average Area,$\frac{ A_{r} }{ <l>^{2} }$')
+    plt.show()
+    plt.savefig("cornell_A_LewisLaw.png")           
+
 
 def nringarea(ringsize,ringarea,ring):
     nringarea = []
@@ -189,8 +217,6 @@ def nringarea(ringsize,ringarea,ring):
     for i in range(len(ringsize)):
         if( ringsize[i] == ring ):
             nringarea.append(ringarea[i])
-
-    
 
     return np.array(nringarea)
 
