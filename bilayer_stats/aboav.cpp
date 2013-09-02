@@ -1,4 +1,12 @@
 //aboav.cpp 
+#include <vector>
+#include <iostream>
+#include <cstdlib>
+#include <cstdio>
+
+#include "vertex.h"
+#include "graph.h"
+
 void aboavDiagnostic(std::vector<Vertex*> &iCycle, std::vector<vector <Vertex*> > &pairs, std::vector<vector<Vertex*> > &rings)
 {
   FILE* out; 
@@ -6,16 +14,16 @@ void aboavDiagnostic(std::vector<Vertex*> &iCycle, std::vector<vector <Vertex*> 
   fprintf(out, "#Ring Coordinates\n"); 
   for(unsigned int i =0; i < iCycle.size(); i++)
     {
-      fprintf(out, "{%f,%f}\n", iCycle[i]->getX(), iCycle[i]->getY()); 
+      fprintf(out, "{%f,%f}\n", iCycle[i]->x, iCycle[i]->y); 
     }
 
   fprintf(out, "\n#RingConnections\n");
   for(unsigned int i =0; i < iCycle.size(); i++)
     {
-      fprintf(out, "#Ring {%f,%f}\n",iCycle[i]->getX(), iCycle[i]->getY());
+      fprintf(out, "#Ring {%f,%f}\n",iCycle[i]->x, iCycle[i]->y);
       for(unsigned int j =0; j < iCycle[i]->edges.size(); j++)
 	{
-	  fprintf(out, "{%f,%f}\n",iCycle[i]->edges[j]->getX(), iCycle[i]->edges[j]->getY());
+	  fprintf(out, "{%f,%f}\n",iCycle[i]->edges[j]->x, iCycle[i]->edges[j]->y);
 	}
       fprintf(out, "\n"); 
     }
@@ -24,14 +32,14 @@ void aboavDiagnostic(std::vector<Vertex*> &iCycle, std::vector<vector <Vertex*> 
   for(unsigned int i =0; i < pairs.size(); i++)
     {
 
-      fprintf(out, "{%f,%f} {%f,%f}\n", pairs[i][0]->getX(), pairs[i][0]->getY(), pairs[i][1]->getX(), pairs[i][1]->getY()); 
+      fprintf(out, "{%f,%f} {%f,%f}\n", pairs[i][0]->x, pairs[i][0]->y, pairs[i][1]->x, pairs[i][1]->y); 
     }
   fprintf(out, "\n#SideRings\n"); 
   for(unsigned int i =0; i < rings.size(); i++)
     {
       for(unsigned int j =0; j < rings[i].size(); j++)
 	{
-	  fprintf(out, "{%f,%f}\n",rings[i][j]->getX(), rings[i][j]->getY());  
+	  fprintf(out, "{%f,%f}\n",rings[i][j]->x, rings[i][j]->y);  
 	}
       fprintf(out,"\n"); 
     }
@@ -50,7 +58,7 @@ std::vector <vector <Vertex*> > sideRings(std::vector <vector <Vertex*> > &pairs
 {
   std::vector <vector <Vertex*> > list; 
   list.clear(); 
-  bool foundiCycle= false; 
+  //bool foundiCycle= false; 
   for(unsigned int i =0; i < pairs.size(); i++)
     {
       for(unsigned int j =0; j < pairs[i][0]->rings.size(); j++)
@@ -95,7 +103,7 @@ double aboavAverage(std::vector <std::vector<Vertex*> > &rings)
    @param average value of the neighboring rings 
    @param iCycle the size of the ring 
  */
-void fillAboavBucket(int aboavBucket[], double &average, std::vector<Vertex*> &iCycle)
+void fillAboavBucket(int aboavBucket[], double &average, std::vector<Vertex*> &iCycle, std::vector<std::vector<int> > &aboavStack)
 {
   std::vector <int> list; 
   for(unsigned int i =0; i < 12; i++) aboavBucket[i]=0; 
@@ -109,7 +117,7 @@ void fillAboavBucket(int aboavBucket[], double &average, std::vector<Vertex*> &i
  @param aboavStack has neighboring rings averages
  @return vector containing the aboav function 
 */
-std::vector <double> globalAboav()
+std::vector <double> globalAboav(std::vector<std::vector<int> > &aboavStack)
 {
   std::vector <double> aboavfunction; 
   for(unsigned int i =0; i < 12; i++) aboavfunction.push_back(0); 
@@ -144,7 +152,7 @@ std::vector <double> globalAboav()
  AboavStack Dump into a file 
  @param aboavStack contains all the info 
  */
-void AboavStackDump()
+void AboavStackDump(std::vector<std::vector <int> > &aboavStack)
 {
   FILE* out; 
   out = fopen("AboavStack.dat","w"); 
@@ -152,38 +160,98 @@ void AboavStackDump()
     {
       for(unsigned int j =0; j < aboavStack[i].size(); j++)
 	{
-	  fprintf(out, "%f ",aboavStack[i][j]); 
+	  fprintf(out, "%d ",aboavStack[i][j]); 
 	}
       fprintf(out,"\n"); 
     }
   fclose(out); 
 }
 
+
+/*
+  Don't double count edges the edges in the Aboav function 
+  @param list is the edge that will be tested to see if already part 
+  of the function 
+  @param pairs contains all the pairs 
+  @return boolean if it's already part of the cycle 
+ */
+bool doubleCount(std::vector <Vertex*> &list, std::vector<std::vector<Vertex*> > &pairs)
+{
+  for(unsigned int i =0; i < pairs.size(); i++)
+    {
+      if(list[0] == pairs[i][0] || list[0] == pairs[i][1])
+	{
+	  if(list[1] == pairs[i][0] || list[0] == pairs[i][1])
+	    {
+	      return true; 
+	    }
+	}
+    }
+  return false; 
+}
+
+/*
+  Find edges from a cycleList and throw them in a file
+  @param vector <Vertex*> ring -- ring to find out how everything is connected 
+  Should be able to do cycle->edges[i] First put out a connectivty matrix 
+ */
+std::vector <std::vector <Vertex*> > findEdges(std::vector <Vertex*> &ring)
+{
+  bool repeat = false; 
+  std::vector <std::vector <Vertex*> > pairs;   
+  for(unsigned int i =0; i<ring.size(); i++)
+    {
+      for(unsigned int j =0; j < ring[i]->edges.size(); j++)
+	{
+	  for(unsigned int k =0; k <ring.size(); k++)
+	    {
+	      if(ring[i]->edges[j] == ring[k])
+		{
+		  std::vector <Vertex*> list; 
+		  list.push_back(ring[i]);
+		  list.push_back(ring[k]);
+		  repeat = doubleCount(list, pairs); 
+		  if(!repeat)
+		    {
+		      pairs.push_back(list);
+		    }
+		  
+		  list.clear(); 
+		
+		}
+	    }// k loop over the vertices 
+	}//j loop over the connection of a single vertex
+    }//i loop over vertices of ring
+  return pairs; 
+  
+}//findEdges()
+
+
 /**
    Calculates the Aboav function 
  */
-void Aboav()
+void Aboav(std::vector<std::vector <Vertex*> > &allCycles, int aboavBucket [],std::vector<std::vector<int> > &aboavStack)
 {
-  double average, value;  
+  double average; //value;  
   std::vector <Vertex*> iCycle; 
   std::vector <vector <Vertex*> > pairs; 
   std::vector <std::vector <Vertex*> > rings; 
   for(unsigned int i =0; i < allCycles.size(); i++)
     {
        iCycle = allCycles[i]; 
-       pairs =findEdges(iCycle); 
+       pairs = findEdges(iCycle); 
       //Now find the other rings in the pairs 
        rings =sideRings(pairs, iCycle); 
       aboavDiagnostic(iCycle, pairs, rings); 
       //Calculate Average 
       average = aboavAverage(rings);
-      fillAboavBucket(aboavBucket, average, iCycle);
+      fillAboavBucket(aboavBucket, average, iCycle,aboavStack);
       iCycle.clear(); 
       pairs.clear(); 
       rings.clear(); 
      }
-  std::vector <double> aboavfunction = globalAboav(); 
-  AboavStackDump(); 
+  std::vector <double> aboavfunction = globalAboav(aboavStack); 
+  AboavStackDump(aboavStack); 
   
   for(unsigned int i =0; i < aboavfunction.size(); i++)
     {
@@ -198,3 +266,5 @@ void Aboav()
     }
   fclose(ringAvg); 
 }
+
+

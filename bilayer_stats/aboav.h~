@@ -1,0 +1,14 @@
+//abaov.h 
+
+#include <vertex>
+
+#include "graph.h"
+#include "vertex.h"
+
+void aboavDiagnostic(std::vector<Vertex*> &iCycle, std::vector<vector <Vertex*> > &pairs, std::vector<vector<Vertex*> > &rings); 
+std::vector <vector <Vertex*> > sideRings(std::vector <vector <Vertex*> > &pairs, std::vector <Vertex*> &iCycle); 
+double aboavAverage(std::vector <std::vector<Vertex*> > &rings); 
+void fillAboavBucket(int aboavBucket[], double &average, std::vector<Vertex*> &iCycle); 
+std::vector <double> globalAboav(); 
+void AboavStackDump(); 
+void Aboav(); 
