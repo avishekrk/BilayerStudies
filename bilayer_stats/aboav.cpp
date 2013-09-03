@@ -15,7 +15,7 @@ void aboavDiagnostic(std::vector<Vertex*> &iCycle, std::vector<vector <Vertex*> 
   for(unsigned int i =0; i < iCycle.size(); i++)
     {
       fprintf(out, "{%f,%f}\n", iCycle[i]->x, iCycle[i]->y); 
-    }
+    }//i loop over coordinates of ring 
 
   fprintf(out, "\n#RingConnections\n");
   for(unsigned int i =0; i < iCycle.size(); i++)
@@ -24,27 +24,27 @@ void aboavDiagnostic(std::vector<Vertex*> &iCycle, std::vector<vector <Vertex*> 
       for(unsigned int j =0; j < iCycle[i]->edges.size(); j++)
 	{
 	  fprintf(out, "{%f,%f}\n",iCycle[i]->edges[j]->x, iCycle[i]->edges[j]->y);
-	}
+	}//j loop over connections 
       fprintf(out, "\n"); 
-    }
+    }//i loop over vertices 
   
       fprintf(out, "\n#Pairs\n"); 
   for(unsigned int i =0; i < pairs.size(); i++)
     {
 
       fprintf(out, "{%f,%f} {%f,%f}\n", pairs[i][0]->x, pairs[i][0]->y, pairs[i][1]->x, pairs[i][1]->y); 
-    }
+    }//i loop over the pairs 
   fprintf(out, "\n#SideRings\n"); 
   for(unsigned int i =0; i < rings.size(); i++)
     {
       for(unsigned int j =0; j < rings[i].size(); j++)
 	{
 	  fprintf(out, "{%f,%f}\n",rings[i][j]->x, rings[i][j]->y);  
-	}
+	}//i loop over the rings 
       fprintf(out,"\n"); 
     }
   fclose(out); 
-}
+}//aboavDiagnostic()
 
 /**
    finds the rings that are around a particular cycle 
@@ -91,21 +91,23 @@ std::vector <vector <Vertex*> > sideRings(std::vector <vector <Vertex*> > &pairs
  */
 double aboavAverage(std::vector <std::vector<Vertex*> > &rings)
 {
-  double sum;  
+  double sum=0.0;  
+  double Nrings = rings.size(); 
   for(unsigned int i =0; i < rings.size(); i++)
     {
       sum+=rings[i].size(); 
     }
-  return sum/rings.size(); 
+  
+  return sum/Nrings; 
 }
 /**
    Fill the Aboav Bucket 
    @param average value of the neighboring rings 
    @param iCycle the size of the ring 
  */
-void fillAboavBucket(int aboavBucket[], double &average, std::vector<Vertex*> &iCycle, std::vector<std::vector<int> > &aboavStack)
+void fillAboavBucket(double aboavBucket[], double &average, std::vector<Vertex*> &iCycle, std::vector<std::vector<double> > &aboavStack)
 {
-  std::vector <int> list; 
+  std::vector <double> list; 
   for(unsigned int i =0; i < 12; i++) aboavBucket[i]=0; 
   aboavBucket[iCycle.size()]= average; 
   for(unsigned int i =0; i < 12; i++) list.push_back(aboavBucket[i]); 
@@ -117,7 +119,7 @@ void fillAboavBucket(int aboavBucket[], double &average, std::vector<Vertex*> &i
  @param aboavStack has neighboring rings averages
  @return vector containing the aboav function 
 */
-std::vector <double> globalAboav(std::vector<std::vector<int> > &aboavStack)
+std::vector <double> globalAboav(std::vector<std::vector<double> > &aboavStack)
 {
   std::vector <double> aboavfunction; 
   for(unsigned int i =0; i < 12; i++) aboavfunction.push_back(0); 
@@ -152,7 +154,7 @@ std::vector <double> globalAboav(std::vector<std::vector<int> > &aboavStack)
  AboavStack Dump into a file 
  @param aboavStack contains all the info 
  */
-void AboavStackDump(std::vector<std::vector <int> > &aboavStack)
+void AboavStackDump(std::vector<std::vector <double> > &aboavStack)
 {
   FILE* out; 
   out = fopen("AboavStack.dat","w"); 
@@ -160,7 +162,7 @@ void AboavStackDump(std::vector<std::vector <int> > &aboavStack)
     {
       for(unsigned int j =0; j < aboavStack[i].size(); j++)
 	{
-	  fprintf(out, "%d ",aboavStack[i][j]); 
+	  fprintf(out, "%f ",float(aboavStack[i][j])); 
 	}
       fprintf(out,"\n"); 
     }
@@ -230,26 +232,28 @@ std::vector <std::vector <Vertex*> > findEdges(std::vector <Vertex*> &ring)
 /**
    Calculates the Aboav function 
  */
-void Aboav(std::vector<std::vector <Vertex*> > &allCycles, int aboavBucket [],std::vector<std::vector<int> > &aboavStack)
+void Aboav(std::vector<std::vector <Vertex*> > &allCycles, double aboavBucket [],std::vector<std::vector<double> > &aboavStack)
 {
   double average; //value;  
   std::vector <Vertex*> iCycle; 
   std::vector <vector <Vertex*> > pairs; 
   std::vector <std::vector <Vertex*> > rings; 
+  unsigned int ringsize; 
   for(unsigned int i =0; i < allCycles.size(); i++)
     {
-       iCycle = allCycles[i]; 
-       pairs = findEdges(iCycle); 
+      iCycle = allCycles[i];
+      ringsize = iCycle.size(); 
+      pairs = findEdges(iCycle); 
       //Now find the other rings in the pairs 
-       rings =sideRings(pairs, iCycle); 
+      rings = sideRings(pairs, iCycle); 
       aboavDiagnostic(iCycle, pairs, rings); 
-      //Calculate Average 
+       //Calculate Average 
       average = aboavAverage(rings);
       fillAboavBucket(aboavBucket, average, iCycle,aboavStack);
       iCycle.clear(); 
       pairs.clear(); 
       rings.clear(); 
-     }
+    }
   std::vector <double> aboavfunction = globalAboav(aboavStack); 
   AboavStackDump(aboavStack); 
   

@@ -12,6 +12,7 @@
 #include "ringarea.h"
 #include "testcases.h"
 #include "tinyxml2.h"
+#include "aboav.h"
 
 //global variables 
 Graph bilayer; 
@@ -19,6 +20,8 @@ std::vector<std::vector<Vertex*> > allCycles;
 std::vector<std::vector<Vertex*> > sortedCycles; 
 const int ringmax = 12; 
 int countBucket[ringmax];
+double aboavBucket[ringmax]; 
+std::vector<std::vector<double> > aboavStack; 
 float areaBucket[ringmax]; 
 std::vector<std::vector<int> > stack; 
 
@@ -314,6 +317,18 @@ void AddRings(vector <vector<Vertex*> > &allCycles)
 }//AddRings()
 
 /*
+  RemoveRings to vertices. Good for removing the wrong rings
+  after a sort and adding the right ones. 
+ */
+void RemoveRings(Graph &bilayer)
+{
+  for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
+    {
+      bilayer.vertices[i]->rings.clear(); 
+    }
+}
+
+/*
   secondSort,Deletes rings that are combination of others from the ring list.
   @param bilayer, bilayer object
   @param allCycles, vector of vector of Vertex* containing ring list 
@@ -501,6 +516,12 @@ int main(int argc, char *argv[])
   
   ringstatsOut(countBucket,basename); 
   areastatsOut(areaBucket,areasum/(bndlength*bndlength),basename); 
+
+  //Running Aboav function 
+  RemoveRings(bilayer); 
+  AddRings(allCycles);
+  Aboav(allCycles,aboavBucket,aboavStack); 
+
   
   return 0; 
 }//main()

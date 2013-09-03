@@ -257,3 +257,19 @@ def plotareahists():
     #f.tight_layout()
     plt.show()
     plt.savefig("cornellA_ringhist.png")
+
+
+def PlotAboav():
+    file = open("ABOAV.dat","r")
+    ringsize = []
+    aring = []
+
+    for line in file:
+        ringsize.append(line.strip('\n').split()[0])
+        aring.append(line.strip('\n').split()[1])
+                
+    plt.plot(ringsize[4:10],aring[4:10],'ro')
+    plt.xlabel('ring size,$r$')
+    plt.ylabel('Average Ring Size, $m_{n}$')
+    plt.title('Cornell_A Aboav Function')
+    plt.savefig('Cornell_A_Aboav.png')
