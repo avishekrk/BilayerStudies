@@ -437,6 +437,13 @@ int main(int argc, char *argv[])
 
   string out = "honeycomb1.m";
 
+  //Debug 
+
+  std::cout << "Number of input arguments is: " << argc << std::endl; 
+  for(int i = 0; i < argc; i++)
+    std::cout << "argv[" << i << "]: " << argv[i] << std::endl; 
+ 
+
   read_xyz(argv[1],bilayer);
   readParameters(argv[2],bondlength,basename); 
 

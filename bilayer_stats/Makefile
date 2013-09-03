@@ -1,5 +1,5 @@
 C++ = g++
-OBJS = main.o vertex.o graph.o ringarea.o testcases.o tinyxml2.o
+OBJS = main.o vertex.o graph.o ringarea.o testcases.o tinyxml2.o aboav.o 
 FLAGS = -ansi -pedantic -W -Wall -Wextra   
 .PHONY: clean 
 
