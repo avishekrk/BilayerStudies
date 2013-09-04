@@ -130,20 +130,20 @@ def nringhistogram(nfile):
 
 
     
-def ringareahistogram():
+def ringareahistogram(basename):
     """
     Plot axes with shared x axes 
     """
     
     ringstats = []
-    ring = open("ringhist.dat","r")
+    ring = open(basename+"ringhist.dat","r")
     mu2 = float(ring.readline())
     for line in ring:
         ringstats.append( line.strip('\n').split()[1] )
     ring.close()
     
     areastats = [] 
-    area = open("areahist.dat","r")
+    area = open(basename+"areahist.dat","r")
     area_length = float(area.readline())
     for line in area:
         print line
@@ -199,16 +199,16 @@ def ringareahistogram():
 
     
     plt.show()
-    plt.savefig("cornell_A_stats.png")
+    plt.savefig("hedye_stats.png")
     plt.clf()
     
     #Lewis Plot
     plt.plot(range(4,12),areaPerRing,'ko')
-    plt.title("Lewis's Law Cornell A Sample")
+    plt.title("Lewis's Law Heyde Sample")
     plt.xlabel("Ring Size, $r$")
     plt.ylabel(r'Average Area,$\frac{ A_{r} }{ <l>^{2} }$')
     plt.show()
-    plt.savefig("cornell_A_LewisLaw.png")           
+    plt.savefig(basename+"LewisLaw.png")           
 
 
 def nringarea(ringsize,ringarea,ring):
@@ -220,12 +220,12 @@ def nringarea(ringsize,ringarea,ring):
 
     return np.array(nringarea)
 
-def plotareahists(): 
+def plotareahists(basename): 
     
     #open the file 
     ringsize = []
     ringarea = []
-    ring = open("cornell_A_ringdist.dat","r")
+    ring = open(basename+"ringdist.dat","r")
     
     for line in ring:
         ringsize.append( line.strip('\n').split()[0] )
@@ -254,15 +254,15 @@ def plotareahists():
             width = 0.7*(bins[1]-bins[0])
             center = (bins[:-1]+bins[1:])/2
             axarr[i,j].bar(center,hist,align='center',width=width)
-            axarr[i,j].set_title('Cornell A %d Ring $x =$ %.2f; $\sigma =$ %.2f'%(ring,avg,std))
+            axarr[i,j].set_title('Heyde %d Ring $x =$ %.2f; $\sigma =$ %.2f'%(ring,avg,std))
             ring += 1 
         
     #f.tight_layout()
     plt.show()
-    plt.savefig("cornellA_ringhist.png")
+    plt.savefig(basename+"ringhist.png")
 
 
-def PlotAboav():
+def PlotAboav(basename):
     file = open("ABOAV.dat","r")
     ringsize = []
     aring = []
@@ -280,5 +280,5 @@ def PlotAboav():
     plt.ylabel('Average Ring Size, $r(m_{r})$')
     plt.xlim(3.5,10.5)
     #plt.ylim(8,4)
-    plt.title('Cornell_A Aboav Function')
-    plt.savefig('Cornell_A_Aboav.png')
+    plt.title('Heyde Aboav Function')
+    plt.savefig('Heyde_Aboav.png')

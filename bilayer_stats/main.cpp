@@ -465,10 +465,12 @@ int main(int argc, char *argv[])
   std::cout << "Making Connections Based On Distance" << std::endl; 
   connectAtoms(bilayer,bondlength);
   
-  std::cout << "Making manual connections" << std::endl; 
-  read_connect(argv[3],bilayer); 
-  MakeHoney(bilayer,basename); 
-
+  if(argc == 4)
+    {
+      std::cout << "Making manual connections" << std::endl; 
+      read_connect(argv[3],bilayer); 
+      MakeHoney(bilayer,basename); 
+    }
 
 
   //start counting cycles 

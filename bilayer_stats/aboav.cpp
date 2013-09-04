@@ -238,11 +238,9 @@ void Aboav(std::vector<std::vector <Vertex*> > &allCycles, double aboavBucket []
   std::vector <Vertex*> iCycle; 
   std::vector <vector <Vertex*> > pairs; 
   std::vector <std::vector <Vertex*> > rings; 
-  unsigned int ringsize; 
   for(unsigned int i =0; i < allCycles.size(); i++)
     {
       iCycle = allCycles[i];
-      ringsize = iCycle.size(); 
       pairs = findEdges(iCycle); 
       //Now find the other rings in the pairs 
       rings = sideRings(pairs, iCycle); 
