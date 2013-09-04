@@ -237,7 +237,8 @@ def plotareahists():
     ringarea = np.array(ringarea,dtype=float)
 
     ring = 4
-    
+    binsize=[10,15,15,15,15,9]
+    binind = 0
     f, axarr = plt.subplots(2,3)
     for i in range(3):
         for j in range(3):
@@ -247,11 +248,13 @@ def plotareahists():
             dist = nringarea(ringsize,ringarea,ring)
             avg = np.mean(dist)
             std = np.std(dist)
-            hist,bins = np.histogram(dist,bins=50)
+            print "binsize: %d" %(binsize[binind])
+            hist,bins = np.histogram(dist,bins=binsize[binind])
+            binind += 1 
             width = 0.7*(bins[1]-bins[0])
             center = (bins[:-1]+bins[1:])/2
             axarr[i,j].bar(center,hist,align='center',width=width)
-            axarr[i,j].set_title('Cornell A %d Ring $x =$ %f; $\sigma =$ %f'%(ring,avg,std))
+            axarr[i,j].set_title('Cornell A %d Ring $x =$ %.2f; $\sigma =$ %.2f'%(ring,avg,std))
             ring += 1 
         
     #f.tight_layout()
@@ -267,9 +270,15 @@ def PlotAboav():
     for line in file:
         ringsize.append(line.strip('\n').split()[0])
         aring.append(line.strip('\n').split()[1])
-                
-    plt.plot(ringsize[4:10],aring[4:10],'ro')
+             
+    ringsize = np.array(ringsize,dtype=int)
+    aring = np.array(aring,dtype=float)
+   
+    
+    plt.plot(ringsize[4:11],ringsize[4:11]*aring[4:11],'ro')
     plt.xlabel('ring size,$r$')
-    plt.ylabel('Average Ring Size, $m_{n}$')
+    plt.ylabel('Average Ring Size, $r(m_{r})$')
+    plt.xlim(3.5,10.5)
+    #plt.ylim(8,4)
     plt.title('Cornell_A Aboav Function')
     plt.savefig('Cornell_A_Aboav.png')
