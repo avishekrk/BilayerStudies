@@ -462,8 +462,8 @@ int main(int argc, char *argv[])
   read_xyz(argv[1],bilayer);
   readParameters(argv[2],bondlength,basename); 
 
-  std::cout << "Making Connections Based On Distance" << std::endl; 
-  connectAtoms(bilayer,bondlength);
+  //std::cout << "Making Connections Based On Distance" << std::endl; 
+  //connectAtoms(bilayer,bondlength);
   
   if(argc == 4)
     {
@@ -471,11 +471,40 @@ int main(int argc, char *argv[])
       read_connect(argv[3],bilayer); 
       MakeHoney(bilayer,basename); 
     }
+  
+  /*
+  std::cout << "Lookcing for 4 coordinates sites" << std::endl; 
+  std::cout << "Number of connections of 240:" << bilayer.vertices[240]->edges.size() << std::endl; 
+  std::cout << "Number of connections 39:" << bilayer.vertices[39]->edges.size() << std::endl; 
 
-
-  //start counting cycles 
+  bilayer.vertices[240]->RemoveEdge(bilayer.vertices[275]);
+  bilayer.vertices[38]->RemoveEdge(bilayer.vertices[39]); 
+  
+  std::cout << "Lookcing for 4 coordinates sites" << std::endl; 
+  std::cout << "Number of connections of 240:" << bilayer.vertices[240]->edges.size() << std::endl; 
+  std::cout << "Number of connections 39:" << bilayer.vertices[39]->edges.size() << std::endl; 
+  */
+ 
+ //start counting cycles 
   for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
     bilayer.vertices[i]->CountCyclesLocally(allCycles); 
+  
+
+
+
+   
+  /*
+  //kill all rings of size 3
+  std::cout << "Killing three rings" << std::endl; 
+  for(unsigned int i = 0; i<allCycles.size(); i++)
+    {
+      if( allCycles[i].size() == 3 )
+	{
+	  allCycles.erase(allCycles.begin()+i);  
+	  i--; 
+	}
+    }
+  */
   AddRings(allCycles);
   std::cout << "Sorting through the Rings Now" << std::endl; 
   for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
