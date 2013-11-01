@@ -142,12 +142,16 @@ void connectAtoms(Graph &bilayer,float dist,int Debug=0)
   @param bilayer, Graph object containing vertices 
   @param nfile, array of characters for name of output file
  */
-void MakeHoney(Graph& bilayer, string nfile="bilayer")
+void MakeHoney(Graph& bilayer, string nfile="bilayer", float rmax =10.0)
 {
   FILE *outFile; 
   string extm="_structure.m"; 
   string extpdf = "_structure.pdf";
   string file = nfile + extm; 
+  float xdist = 0.0; 
+  float ydist = 0.0; 
+  float r = 0.0; 
+  
   outFile = fopen(file.c_str(), "w");
 
 
@@ -158,12 +162,18 @@ void MakeHoney(Graph& bilayer, string nfile="bilayer")
     {
       for(unsigned int i =0; i < bilayer.vertices[j]->edges.size(); i++)
         {
-          
-	  fprintf(outFile, ", \nLine[{{%f,%f},{%f,%f}}]", bilayer.vertices[j]->x,
-		  bilayer.vertices[j]->y,
-		  bilayer.vertices[j]->edges[i]->x,
-		  bilayer.vertices[j]->edges[i]->y);
+	  xdist = bilayer.vertices[j]->x - bilayer.vertices[j]->edges[i]->x; 
+	  ydist = bilayer.vertices[j]->y - bilayer.vertices[j]->edges[i]->y; 
+	  r = sqrt(xdist*xdist + ydist*ydist); 
+	  if(r < rmax )
+	    {
+
+	      fprintf(outFile, ", \nLine[{{%f,%f},{%f,%f}}]", bilayer.vertices[j]->x,
+		      bilayer.vertices[j]->y,
+		      bilayer.vertices[j]->edges[i]->x,
+		      bilayer.vertices[j]->edges[i]->y);
 	  
+	    }
         }
     }
 
@@ -528,6 +538,44 @@ int main(int argc, char *argv[])
 	sortedCycles.push_back(ringSort(allCycles[i]));
       }
   fclose(ring); 
+
+
+
+  //Do PBC for rings
+  int n = 0; 
+  int m = 0; 
+  float xdist = 0.0; 
+  float ydist = 0.0; 
+  float rdist = 0.0;  
+  bool tooBig = false; 
+
+  for(unsigned int i = 0; i < sortedCycles.size(); i++)
+    {
+      tooBig = false; 
+      for(unsigned int j = 0; j < sortedCycles[i].size(); j++)
+	{
+	  n = j; 
+	  if(n == sortedCycles[i].size() - 1 )
+	    m = 0; 
+	  else
+	    m = n + 1; 
+	  xdist = sortedCycles[i][n]->x - sortedCycles[i][m]->x; 
+	  ydist = sortedCycles[i][n]->y - sortedCycles[i][m]->y; 
+	  rdist = sqrt(xdist*xdist + ydist*ydist); 
+	  std::cout << "rdist: " << rdist << std::endl; 
+	  if (rdist > 10)
+	    {
+	      std::cout << "Too Big" << std::endl; 
+	      tooBig = true; 
+	      break; 
+	    }
+	}//j loop over vertices of ring i 
+      if(tooBig)
+	{
+	  sortedCycles.erase(sortedCycles.begin()+i); 
+	  i--; 
+	}
+    }//i loop over rings 
   
   polygonGraphics(sortedCycles,basename); 
   bndlength = avgbnd_length(bilayer); 
