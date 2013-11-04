@@ -473,7 +473,7 @@ int main(int argc, char *argv[])
   readParameters(argv[2],bondlength,basename); 
 
   //std::cout << "Making Connections Based On Distance" << std::endl; 
-  //connectAtoms(bilayer,bondlength);
+  connectAtoms(bilayer,bondlength);
   
   if(argc == 4)
     {
@@ -515,6 +515,7 @@ int main(int argc, char *argv[])
 	}
     }
   */
+
   AddRings(allCycles);
   std::cout << "Sorting through the Rings Now" << std::endl; 
   for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
@@ -584,7 +585,6 @@ int main(int argc, char *argv[])
 
   for(int i = 0; i < ringmax; i++)
     areasum += areaBucket[i]; 
-  
   
   std::cout << "sum of area bucket " << areasum << std::endl; 
   std::cout << "average bond length " << avgbnd_length(bilayer) << std::endl; 
