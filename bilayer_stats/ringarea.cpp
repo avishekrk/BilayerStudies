@@ -164,3 +164,49 @@ float avgbnd_length(Graph &bilayer)
 
   return bnd_length/((float)nbonds); 
 }//avgbnd_length 
+
+
+/*
+  Checks if the rings are on the edges due to the periodic boundary conditions.
+  TODO: Currently hardcodes for a dist of 10 as a PBC. Need to make variable. 
+ */
+void PolygonPBC(std::vector<std::vector<Vertex*> > &sortedCycles)
+{
+  
+  //Do PBC for rings
+  unsigned int n = 0; 
+  unsigned int m = 0; 
+  float xdist = 0.0; 
+  float ydist = 0.0; 
+  float rdist = 0.0;  
+  bool tooBig = false; 
+
+  for(unsigned int i = 0; i < sortedCycles.size(); i++)
+    {
+      tooBig = false; 
+      for(unsigned int j = 0; j < sortedCycles[i].size(); j++)
+	{
+	  n = j; 
+	  if(n == sortedCycles[i].size() - 1 )
+	    m = 0; 
+	  else
+	    m = n + 1; 
+	  xdist = sortedCycles[i][n]->x - sortedCycles[i][m]->x; 
+	  ydist = sortedCycles[i][n]->y - sortedCycles[i][m]->y; 
+	  rdist = sqrt(xdist*xdist + ydist*ydist); 
+	  std::cout << "rdist: " << rdist << std::endl; 
+	  if (rdist > 10)
+	    {
+	      std::cout << "Too Big" << std::endl; 
+	      tooBig = true; 
+	      break; 
+	    }
+	}//j loop over vertices of ring i 
+      if(tooBig)
+	{
+	  sortedCycles.erase(sortedCycles.begin()+i); 
+	  i--; 
+	}
+    }//i loop over rings 
+
+}//PolygonPBC()

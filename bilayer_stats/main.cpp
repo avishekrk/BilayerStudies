@@ -541,10 +541,10 @@ int main(int argc, char *argv[])
   fclose(ring); 
 
 
-
+  /*
   //Do PBC for rings
-  int n = 0; 
-  int m = 0; 
+  unsigned int n = 0; 
+  unsigned int m = 0; 
   float xdist = 0.0; 
   float ydist = 0.0; 
   float rdist = 0.0;  
@@ -577,7 +577,9 @@ int main(int argc, char *argv[])
 	  i--; 
 	}
     }//i loop over rings 
+  */
   
+  PolygonPBC(sortedCycles); 
   polygonGraphics(sortedCycles,basename); 
   bndlength = avgbnd_length(bilayer); 
   
