@@ -43,8 +43,17 @@ void read_xyz(char *file, Graph &bilayer,bool Debug=false)
       std::cerr << "Cannot open file: " << file << std::endl; 
       exit(1);
     }
-  fscanf(in, "%d", &numatoms);
-  fscanf(in, "%s\n",buffer);
+  if(fscanf(in, "%d", &numatoms))
+    {
+      std::cout << "Number of atoms: " << numatoms << std::endl; 
+    }
+  else
+    {
+      std::cerr << "ERROR reading number of atoms" << std::endl; exit(1); 
+    }
+
+    fscanf(in, "%s\n",buffer);
+
   if(Debug)
     {
       printf("%d\n",numatoms);
@@ -83,8 +92,15 @@ void read_connect(char *file, Graph &bilayer)
       std::cerr << "Cannot open file: " << file << std::endl; 
       exit(1); 
     }
-  fscanf(in,"%d",&nconnect); 
-  std::cout << "Number of manual connections: " << nconnect << std::endl; 
+  if(fscanf(in,"%d",&nconnect)) 
+    {
+      std::cout << "Number of manual connections: " << nconnect << std::endl; 
+    }
+  else
+    {
+      std::cerr << "Error reading number of connections" << std::endl; 
+      exit(1); 
+    }
 
   while( 2 == fscanf(in,"%d %d\n",&i,&j) )
     {
@@ -451,6 +467,7 @@ int main(int argc, char *argv[])
   if ( argc < 3 )
     {
       std::cerr << "Not enough input arguments: " << argc << std::endl; 
+      std::cout << "./main.e coordinates.xyz coordinates.xml coordinates.con" << std::endl; 
       exit(1);  
     }
   
@@ -473,7 +490,7 @@ int main(int argc, char *argv[])
   readParameters(argv[2],bondlength,basename); 
 
   //std::cout << "Making Connections Based On Distance" << std::endl; 
-  connectAtoms(bilayer,bondlength);
+  //connectAtoms(bilayer,bondlength);
   
   if(argc == 4)
     {

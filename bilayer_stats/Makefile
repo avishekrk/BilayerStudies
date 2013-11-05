@@ -1,13 +1,15 @@
 C++ = g++
 OBJS = main.o vertex.o graph.o ringarea.o testcases.o tinyxml2.o aboav.o 
-FLAGS = -ansi -pedantic -W -Wall -Wextra -g   
+FLAGS = -ansi -pedantic -W -Wall -Wextra 
+OPTS = -O3
+#DEBUG = -g    
 .PHONY: clean 
 
 main.e: $(OBJS)
-	$(C++) $(FLAGS) $(OBJS) -o main.e 
+	$(C++) $(FLAGS) $(OPTS) $(DEBUG) $(OBJS) -o main.e 
 
 %.o : %.cpp
-	g++ -c $(FLAGS) $<
+	g++ -c $(FLAGS) $(OPTS) $(DEBUG) $<
 
 clean:
 	rm -rf *.e *.o
