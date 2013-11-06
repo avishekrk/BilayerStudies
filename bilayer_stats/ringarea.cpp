@@ -159,7 +159,7 @@ bool PBCcheck(std::vector<Vertex*> &ring)
   ringArea, calculated the area of of convex polygon and return a
   sorted ring list 
  */
-float ringArea(std::vector<Vertex*>  &ring_unsorted, float areaBucket[], bool Debug)
+float ringArea(std::vector<Vertex*>  &ring_unsorted, float areaBucket[], float latticex, float latticey, bool Debug)
 { 
  
   std::vector <Vertex*> ring = ringSort(ring_unsorted,Debug); 
@@ -169,8 +169,8 @@ float ringArea(std::vector<Vertex*>  &ring_unsorted, float areaBucket[], bool De
       std::cout << "Need to adjust the PBC conditions here" << std::endl; 
       float xdist = 0.0; 
       float ydist = 0.0; 
-      float a = 27; 
-      float b = 20.78; 
+      float a = latticex; 
+      float b = latticey; 
       float *x = new float[ring.size()+1]; 
       float *y = new float[ring.size()+1]; 
       unsigned int n = 0; 
@@ -233,7 +233,7 @@ float ringArea(std::vector<Vertex*>  &ring_unsorted, float areaBucket[], bool De
 /*
   Calculates the average bond length of all the bonds. 
  */
-float avgbnd_length(Graph &bilayer)
+float avgbnd_length(Graph &bilayer,float latticex, float latticey)
 {
   float bnd_length=0; 
   int nbonds = 0; 
@@ -244,7 +244,17 @@ float avgbnd_length(Graph &bilayer)
       for(unsigned int j = 0; j < bilayer.vertices[i]->edges.size(); j++)
 	{
 	  xij = bilayer.vertices[i]->x - bilayer.vertices[i]->edges[j]->x;
+	  if(xij > (latticex/2))
+	    xij -= latticex; 
+	  if(xij < -(latticex/2))
+	    xij += latticex; 
+	  
 	  yij = bilayer.vertices[i]->y - bilayer.vertices[i]->edges[j]->y;
+	  if(yij > (latticey/2) )
+	    yij -= latticey; 
+	  if(yij < -(latticey/2))
+	    yij += latticey; 
+
 	  zij = bilayer.vertices[i]->z - bilayer.vertices[i]->edges[j]->z;
 	  r = sqrt( xij*xij + yij*yij + zij*zij );
 	  bnd_length += r; 

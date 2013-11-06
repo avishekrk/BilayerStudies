@@ -448,7 +448,7 @@ void areastatsOut(float areaBucket[], float areabndlength, string nfile="bilayer
   
 }//areastatsOut()
 
-void readParameters(char *nfile,float &bondlength, string &basename)
+void readParameters(char *nfile,float &bondlength, string &basename, float &a, float &b)
 {
   tinyxml2::XMLDocument doc; 
   doc.LoadFile(nfile); 
@@ -460,21 +460,19 @@ void readParameters(char *nfile,float &bondlength, string &basename)
   if(pbc)
     {
       std::cout << "Using PBC conditions " << std::endl; 
-      float a = atof(doc.FirstChildElement("root")->FirstChildElement("latticex")->GetText()); 
-      float b = atof(doc.FirstChildElement("root")->FirstChildElement("latticey")->GetText());
+      a = atof(doc.FirstChildElement("root")->FirstChildElement("latticex")->GetText()); 
+      b = atof(doc.FirstChildElement("root")->FirstChildElement("latticey")->GetText());
       std::cout << "a: " << a << " " << "b: " << b << std::endl; 
     }
   else
     {
-      float a = 0.;
-      float b = 0.; 
+      a = 0.;
+      b = 0.; 
     }
 
   std::cout << "bondlength: " << bondlength << std::endl; 
   std::cout << "basename: " << basename << std::endl; 
-  exit(1); 
-
-
+  
 }//readParameters()
 
 //ringstatsOut
@@ -492,9 +490,9 @@ int main(int argc, char *argv[])
   string basename; 
   float areasum = 0.; 
   float bndlength; 
+  float latticex, latticey; 
 
-
-  string out = "honeycomb1.m";
+  //string out = "honeycomb1.m";
 
   //Debug 
   std::cout << "Number of input arguments is: " << argc << std::endl; 
@@ -503,7 +501,7 @@ int main(int argc, char *argv[])
  
 
   read_xyz(argv[1],bilayer);
-  readParameters(argv[2],bondlength,basename); 
+  readParameters(argv[2],bondlength,basename,latticex,latticey); 
 
   //std::cout << "Making Connections Based On Distance" << std::endl; 
   //connectAtoms(bilayer,bondlength);
@@ -542,7 +540,7 @@ int main(int argc, char *argv[])
   for(unsigned int i = 0; i < allCycles.size(); i++)
       {
 	cycle = ringSort(allCycles[i]); 
-	fprintf(ring,"%d %f\n",allCycles[i].size(),ringArea(cycle,areaBucket) ); 
+	fprintf(ring,"%d %f\n",allCycles[i].size(),ringArea(cycle,areaBucket,latticex,latticey) ); 
 	sortedCycles.push_back(ringSort(allCycles[i]));
       }
   fclose(ring); 
@@ -550,14 +548,14 @@ int main(int argc, char *argv[])
   
   PolygonPBC(sortedCycles); 
   polygonGraphics(sortedCycles,basename); 
-  bndlength = avgbnd_length(bilayer); 
+  bndlength = avgbnd_length(bilayer,latticex,latticey); 
   
 
   for(int i = 0; i < ringmax; i++)
     areasum += areaBucket[i]; 
   
   std::cout << "sum of area bucket " << areasum << std::endl; 
-  std::cout << "average bond length " << avgbnd_length(bilayer) << std::endl; 
+  std::cout << "average bond length " << avgbnd_length(bilayer,latticex,latticey) << std::endl; 
   std::cout << "area/avgbondlength*2 " << areasum/( bndlength*bndlength ) << std::endl; 
   
   for(int i = 0; i < ringmax; i++)
