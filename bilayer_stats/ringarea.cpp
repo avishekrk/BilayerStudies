@@ -171,10 +171,12 @@ float ringArea(std::vector<Vertex*>  &ring_unsorted, float areaBucket[], bool De
       float ydist = 0.0; 
       float a = 27; 
       float b = 20.78; 
-      float *x = new float[ring.size()]; 
-      float *y = new float[ring.size()]; 
+      float *x = new float[ring.size()+1]; 
+      float *y = new float[ring.size()+1]; 
       unsigned int n = 0; 
       unsigned int m = 0; 
+      double left = 0.0; 
+      double right = 0.0; 
 
       x[n] = ring[n]->x; 
       y[n] = ring[n]->y;
@@ -201,16 +203,27 @@ float ringArea(std::vector<Vertex*>  &ring_unsorted, float areaBucket[], bool De
 	    y[m] = ring[m]->y; 
 	  n++; 
 	}
-       
+      x[ring.size()] = x[0]; 
+      y[ring.size()] = y[0]; 
+
       for(unsigned int i = 0; i < ring.size(); i++)
 	{
-	  std::cout << "i: " << i << " ring[i]->x: " << ring[i]->x << " " << "ring[i]->y" << ring[i]->y << std::endl; 
+	  std::cout << "i: " << i << " ring[i]->x: " << ring[i]->x << " " << "ring[i]->y " << ring[i]->y << std::endl; 
 	  std::cout <<"i: " << i << " " << "x: " << x[i] << " " << "y: " << y[i] << std::endl; 
 	}
 
+      
+      //calculate area here 
+      for(unsigned int i = 0; i < ring.size(); i++)
+	{
+	  left += x[i]*y[i+1];
+	  right += y[i]*x[i+1]; 
+	}
+      
       delete [] x; 
       delete [] y; 
-      exit(1); 
+      return abs(0.5*(left-right));
+      
     }
   areaBucket[ring.size()] += area; 
   return area; 

@@ -105,7 +105,7 @@ void read_connect(char *file, Graph &bilayer)
 
   while( 2 == fscanf(in,"%d %d\n",&i,&j) )
     {
-      std::cout << "Making connection between i: " << i << " and j: " << j << std::endl; 
+      //std::cout << "Making connection between i: " << i << " and j: " << j << std::endl; 
       bilayer.vertices[i]->AddEdge(bilayer.vertices[j]); 
       nconcount++; 
     }
@@ -455,9 +455,25 @@ void readParameters(char *nfile,float &bondlength, string &basename)
 
   bondlength = atof( doc.FirstChildElement("root")->FirstChildElement("bondlength")->GetText() );
   basename = doc.FirstChildElement("root")->FirstChildElement("basename")->GetText(); 
+  bool pbc = atoi( doc.FirstChildElement("root")->FirstChildElement("pbc")->GetText() );
+
+  if(pbc)
+    {
+      std::cout << "Using PBC conditions " << std::endl; 
+      float a = atof(doc.FirstChildElement("root")->FirstChildElement("latticex")->GetText()); 
+      float b = atof(doc.FirstChildElement("root")->FirstChildElement("latticey")->GetText());
+      std::cout << "a: " << a << " " << "b: " << b << std::endl; 
+    }
+  else
+    {
+      float a = 0.;
+      float b = 0.; 
+    }
 
   std::cout << "bondlength: " << bondlength << std::endl; 
   std::cout << "basename: " << basename << std::endl; 
+  exit(1); 
+
 
 }//readParameters()
 
@@ -519,8 +535,6 @@ int main(int argc, char *argv[])
    
   for(int i = 0; i < ringmax; i++) areaBucket[i] = 0.0; 
 
-
-  //Make into a function 
   FILE *ring;
   std::vector<Vertex*> cycle; 
   string ext = "_ringdist.dat";
@@ -533,51 +547,11 @@ int main(int argc, char *argv[])
       }
   fclose(ring); 
 
-
-  /*
-  //Do PBC for rings
-  
-  unsigned int n = 0; 
-  unsigned int m = 0; 
-  float xdist = 0.0; 
-  float ydist = 0.0; 
-  float rdist = 0.0;  
-  bool tooBig = false; 
-
-  for(unsigned int i = 0; i < sortedCycles.size(); i++)
-    {
-      tooBig = false; 
-      for(unsigned int j = 0; j < sortedCycles[i].size(); j++)
-	{
-	  n = j; 
-	  if(n == sortedCycles[i].size() - 1 )
-	    m = 0; 
-	  else
-	    m = n + 1; 
-	  xdist = sortedCycles[i][n]->x - sortedCycles[i][m]->x; 
-	  ydist = sortedCycles[i][n]->y - sortedCycles[i][m]->y; 
-	  rdist = sqrt(xdist*xdist + ydist*ydist); 
-	  std::cout << "rdist: " << rdist << std::endl; 
-	  if (rdist > 10)
-	    {
-	      std::cout << "Too Big" << std::endl; 
-	      tooBig = true; 
-	      break; 
-	    }
-	}//j loop over vertices of ring i 
-      if(tooBig)
-	{
-	  sortedCycles.erase(sortedCycles.begin()+i); 
-	  i--; 
-	}
-    }//i loop over rings 
-  */
   
   PolygonPBC(sortedCycles); 
   polygonGraphics(sortedCycles,basename); 
   bndlength = avgbnd_length(bilayer); 
   
-    
 
   for(int i = 0; i < ringmax; i++)
     areasum += areaBucket[i]; 
