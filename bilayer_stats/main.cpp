@@ -52,7 +52,8 @@ void read_xyz(char *file, Graph &bilayer,bool Debug=false)
       std::cerr << "ERROR reading number of atoms" << std::endl; exit(1); 
     }
 
-    fscanf(in, "%s\n",buffer);
+  if(fscanf(in, "%s\n",buffer))
+    
 
   if(Debug)
     {
@@ -480,7 +481,6 @@ int main(int argc, char *argv[])
   string out = "honeycomb1.m";
 
   //Debug 
-
   std::cout << "Number of input arguments is: " << argc << std::endl; 
   for(int i = 0; i < argc; i++)
     std::cout << "argv[" << i << "]: " << argv[i] << std::endl; 
@@ -499,40 +499,12 @@ int main(int argc, char *argv[])
       MakeHoney(bilayer,basename); 
     }
   
-  /*
-  std::cout << "Lookcing for 4 coordinates sites" << std::endl; 
-  std::cout << "Number of connections of 240:" << bilayer.vertices[240]->edges.size() << std::endl; 
-  std::cout << "Number of connections 39:" << bilayer.vertices[39]->edges.size() << std::endl; 
 
-  bilayer.vertices[240]->RemoveEdge(bilayer.vertices[275]);
-  bilayer.vertices[38]->RemoveEdge(bilayer.vertices[39]); 
-  
-  std::cout << "Lookcing for 4 coordinates sites" << std::endl; 
-  std::cout << "Number of connections of 240:" << bilayer.vertices[240]->edges.size() << std::endl; 
-  std::cout << "Number of connections 39:" << bilayer.vertices[39]->edges.size() << std::endl; 
-  */
  
  //start counting cycles 
   for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
     bilayer.vertices[i]->CountCyclesLocally(allCycles); 
   
-
-
-
-   
-  /*
-  //kill all rings of size 3
-  std::cout << "Killing three rings" << std::endl; 
-  for(unsigned int i = 0; i<allCycles.size(); i++)
-    {
-      if( allCycles[i].size() == 3 )
-	{
-	  allCycles.erase(allCycles.begin()+i);  
-	  i--; 
-	}
-    }
-  */
-
   AddRings(allCycles);
   std::cout << "Sorting through the Rings Now" << std::endl; 
   for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
@@ -546,13 +518,17 @@ int main(int argc, char *argv[])
   
    
   for(int i = 0; i < ringmax; i++) areaBucket[i] = 0.0; 
-  
-  FILE *ring; 
+
+
+  //Make into a function 
+  FILE *ring;
+  std::vector<Vertex*> cycle; 
   string ext = "_ringdist.dat";
   ring = fopen((basename+ext).c_str(),"w"); 
   for(unsigned int i = 0; i < allCycles.size(); i++)
       {
-	fprintf(ring,"%d %f\n",allCycles[i].size(), ringArea(allCycles[i],areaBucket) ); 
+	cycle = ringSort(allCycles[i]); 
+	fprintf(ring,"%d %f\n",allCycles[i].size(),ringArea(cycle,areaBucket) ); 
 	sortedCycles.push_back(ringSort(allCycles[i]));
       }
   fclose(ring); 
@@ -560,6 +536,7 @@ int main(int argc, char *argv[])
 
   /*
   //Do PBC for rings
+  
   unsigned int n = 0; 
   unsigned int m = 0; 
   float xdist = 0.0; 

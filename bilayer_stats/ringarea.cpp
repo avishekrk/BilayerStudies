@@ -126,14 +126,92 @@ float calcarea(std::vector<Vertex*> &ring,bool Debug)
 }//calcarea()
 
 /*
+  PBCcheck for periodic boudary coundtions 
+ */
+bool PBCcheck(std::vector<Vertex*> &ring)
+{
+  
+  unsigned int n = 0; 
+  unsigned int m = 0; 
+  float xdist = 0.0; 
+  float ydist = 0.0; 
+  float rdist = 0.0;  
+   
+  for(unsigned int i = 0; i < ring.size(); i++)
+    {
+      n = i; 
+      if(n == (ring.size() - 1) )
+	m = 0;
+      else
+	m = n +1; 
+      xdist = ring[n]->x - ring[m]->x; 
+      ydist = ring[n]->y - ring[m]->y;
+      rdist = sqrt(xdist*xdist + ydist*ydist); 
+      if (rdist > 10)
+	return true; 
+    }//j loop over vertices of ring i 
+  
+  return false; 
+  
+}//PBCcheck 
+
+/*
   ringArea, calculated the area of of convex polygon and return a
   sorted ring list 
  */
 float ringArea(std::vector<Vertex*>  &ring_unsorted, float areaBucket[], bool Debug)
-{
-  
+{ 
+ 
   std::vector <Vertex*> ring = ringSort(ring_unsorted,Debug); 
   float area = calcarea(ring); 
+  if(PBCcheck(ring))
+    {
+      std::cout << "Need to adjust the PBC conditions here" << std::endl; 
+      float xdist = 0.0; 
+      float ydist = 0.0; 
+      float a = 27; 
+      float b = 20.78; 
+      float *x = new float[ring.size()]; 
+      float *y = new float[ring.size()]; 
+      unsigned int n = 0; 
+      unsigned int m = 0; 
+
+      x[n] = ring[n]->x; 
+      y[n] = ring[n]->y;
+      while(n < ring.size() )
+	{
+	  if(n == ring.size() - 1 )
+	    m = 0; 
+	  else
+	    m = n + 1; 
+	  
+	  xdist = x[n] - ring[m]->x; 
+	  ydist = y[n] - ring[m]->y; 
+	  if(xdist > a/2)
+	    x[m] = ring[m]->x + a; 
+	  else if(xdist < -(a/2))
+	    x[m] = ring[m]->x - a;
+	  else
+	    x[m] = ring[m]->x; 
+	  if(ydist > b/2)
+	    y[m] = ring[m]->y + b; 
+	  else if(ydist < -(b/2))
+	    y[m] = ring[m]->y - b;
+	  else
+	    y[m] = ring[m]->y; 
+	  n++; 
+	}
+       
+      for(unsigned int i = 0; i < ring.size(); i++)
+	{
+	  std::cout << "i: " << i << " ring[i]->x: " << ring[i]->x << " " << "ring[i]->y" << ring[i]->y << std::endl; 
+	  std::cout <<"i: " << i << " " << "x: " << x[i] << " " << "y: " << y[i] << std::endl; 
+	}
+
+      delete [] x; 
+      delete [] y; 
+      exit(1); 
+    }
   areaBucket[ring.size()] += area; 
   return area; 
 }
@@ -170,7 +248,7 @@ float avgbnd_length(Graph &bilayer)
   Checks if the rings are on the edges due to the periodic boundary conditions.
   TODO: Currently hardcodes for a dist of 10 as a PBC. Need to make variable. 
  */
-void PolygonPBC(std::vector<std::vector<Vertex*> > &sortedCycles)
+void PolygonPBC(std::vector<std::vector<Vertex*> > &sortedCycles, bool Debug)
 {
   
   //Do PBC for rings
@@ -194,10 +272,12 @@ void PolygonPBC(std::vector<std::vector<Vertex*> > &sortedCycles)
 	  xdist = sortedCycles[i][n]->x - sortedCycles[i][m]->x; 
 	  ydist = sortedCycles[i][n]->y - sortedCycles[i][m]->y; 
 	  rdist = sqrt(xdist*xdist + ydist*ydist); 
-	  std::cout << "rdist: " << rdist << std::endl; 
+	  if(Debug)
+	    std::cout << "rdist: " << rdist << std::endl; 
 	  if (rdist > 10)
 	    {
-	      std::cout << "Too Big" << std::endl; 
+	      if(Debug)
+		std::cout << "Too Big" << std::endl; 
 	      tooBig = true; 
 	      break; 
 	    }
