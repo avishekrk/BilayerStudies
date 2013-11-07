@@ -1,8 +1,8 @@
 C++ = g++
 OBJS = main.o vertex.o graph.o ringarea.o testcases.o tinyxml2.o aboav.o 
 FLAGS = -ansi -pedantic -W -Wall -Wextra 
-OPTS = -O3
-#DEBUG = -g    
+#OPTS = -O3
+DEBUG = -g    
 .PHONY: clean 
 
 main.e: $(OBJS)

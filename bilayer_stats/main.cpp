@@ -66,7 +66,8 @@ void read_xyz(char *file, Graph &bilayer,bool Debug=false)
 	printf("%s %.15f %.15f %.15f\n",atom,x,y,z);
       if (atom[0] == 'O')
 	{
-	  continue; 
+	  //continue;
+	  bilayer.vertices.push_back(new Vertex(8,x,y,z)); 
 	}
       else
 	{
@@ -500,7 +501,7 @@ int main(int argc, char *argv[])
     std::cout << "argv[" << i << "]: " << argv[i] << std::endl; 
  
 
-  read_xyz(argv[1],bilayer);
+  read_xyz(argv[1],bilayer,true);
   readParameters(argv[2],bondlength,basename,latticex,latticey); 
 
   //std::cout << "Making Connections Based On Distance" << std::endl; 
