@@ -77,6 +77,24 @@ def connectSi2O(atom,coordinates,rmax=1.25,Verbose=False):
                     if(r < rmax): connect.append([i,j])
     return np.array(connect,dtype=int)
 
+def outputConnect(basename,connect): 
+    """
+    outputConnect, output the connectivity table
+    
+    outputConnect(basename,connect)
+
+    inputs:
+    basename: basename of the file
+    connect: numpy array of connectivity 
+    """
+    print "Output Connectivity Table:%s"%(basename)+".con"
+    outfile=open(basename+".con","w")
+    outfile.write("%d\n"%len(connect))
+    for con in connect:
+        outfile.write("%d %d\n"%(con[0],con[1]))
+    outfile.close()
+
+
 def main():
 
     basename=sys.argv[1].split('/')[-1].split('.')[0]
@@ -86,13 +104,15 @@ def main():
 
     print "Looking for connections"
     connect = connectSi2O(atom,coordinates)
+    outputConnect(basename,connect)
 
-    print "Output Connectivity Table:%s"%(basename)+".con"
-    outfile=open(basename+".con","w")
-    outfile.write("%d\n"%len(connect))
-    for con in connect:
-        outfile.write("%d %d\n"%(con[0],con[1]))
-    outfile.close()
+#    print "Output Connectivity Table:%s"%(basename)+".con"
+ #   outfile=open(basename+".con","w")
+  #  outfile.write("%d\n"%len(connect))
+   # for con in connect:
+    #    outfile.write("%d %d\n"%(con[0],con[1]))
+   # outfile.close()
+    
 
 
 if __name__ == "__main__" and len(sys.argv) == 3:

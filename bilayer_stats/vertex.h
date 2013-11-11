@@ -34,7 +34,7 @@ class Vertex
   //Ring Counter Functions 
   Vertex* BFS(double xFind, double yFind, int searchDepth);
   void findCyclesToSelf(int maxCycleSize, std::vector<std::vector<Vertex*> > &cycleList);
-  void CountCyclesLocally(std::vector<std::vector<Vertex*> >& allCycles);
+  void CountCyclesLocally(int depth, std::vector<std::vector<Vertex*> >&allCycles);
   void AddRing(std::vector<Vertex*> cycle); 
 
 };

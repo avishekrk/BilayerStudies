@@ -190,13 +190,14 @@ void Vertex::findCyclesToSelf(int maxCycleSize, std::vector<std::vector<Vertex*>
 
 /*
   CountCycles function BFS around a vertex until it finds itself and stores in allCycles
-  @param: allCycles: CycleList 
+  @param: allCycles: CycleList
+  @param: depth: depth for BFS
   @param: countBucket: keeps track for ring statistics 
 */
-void Vertex::CountCyclesLocally(std::vector<std::vector<Vertex*> >& allCycles)
+void Vertex::CountCyclesLocally(int depth,std::vector<std::vector<Vertex*> > &allCycles)
 {
 
-  this->findCyclesToSelf(11, allCycles);
+  this->findCyclesToSelf(depth, allCycles);
   
   for(unsigned int i = 0; i < allCycles.size(); i++) //Make sure cycle doesn't go back on itself                            {
     {

@@ -209,18 +209,18 @@ void fillCountBucket(int countBucket[], std::vector <std::vector<Vertex*> > &all
   string file = nfile + extdat; 
   
   std::vector <int> list;
-  for(unsigned int i =0; i<12; i++) countBucket[i] =0;
+  for(int i =0; i<ringmax; i++) countBucket[i] =0;
   for(unsigned int i =0; i<allCycles.size(); i++) countBucket[allCycles[i].size()]++;
-  for(unsigned int i =0; i<12; i++) list.push_back(countBucket[i]);
+  for(int i =0; i<ringmax; i++) list.push_back(countBucket[i]);
   
   stack.push_back(list);
   list.clear();
   
 
   int ring_sum =0;
-  for(int i =0; i < 12; i++) { ring_sum += i*countBucket[i];}
+  for(int i =0; i < ringmax; i++) { ring_sum += i*countBucket[i];}
   int sum =0;
-  for(int i = 0; i < 12; i++){sum += countBucket[i];}
+  for(int i = 0; i < ringmax; i++){sum += countBucket[i];}
 
   double average = (double) ring_sum/sum;
 
@@ -228,7 +228,7 @@ void fillCountBucket(int countBucket[], std::vector <std::vector<Vertex*> > &all
   
   count = fopen(file.c_str(), "w");
   fprintf(count, "Ring Statistics\n");
-  for(int i =0; i < 12; i++) fprintf(count, "%d RINGS: %d\n", i, countBucket[i]);
+  for(int i =0; i < ringmax; i++) fprintf(count, "%d RINGS: %d\n", i, countBucket[i]);
   fprintf(count, "RING SUM: %d\n",ring_sum);
   fprintf(count, "SUM: %d\n", sum);
   fprintf(count, "AVERAGE: %f\n",average);
@@ -454,7 +454,12 @@ void readParameters(char *nfile,float &bondlength, string &basename, float &a, f
   tinyxml2::XMLDocument doc; 
   doc.LoadFile(nfile); 
 
-  bondlength = atof( doc.FirstChildElement("root")->FirstChildElement("bondlength")->GetText() );
+  bool distbond = atoi( doc.FirstChildElement("root")->FirstChildElement("distbond")->GetText() ); 
+  if(distbond)
+    bondlength = atof( doc.FirstChildElement("root")->FirstChildElement("bondlength")->GetText() );
+  else
+    bondlength = 0; 
+
   basename = doc.FirstChildElement("root")->FirstChildElement("basename")->GetText(); 
   bool pbc = atoi( doc.FirstChildElement("root")->FirstChildElement("pbc")->GetText() );
 
@@ -476,6 +481,29 @@ void readParameters(char *nfile,float &bondlength, string &basename, float &a, f
   
 }//readParameters()
 
+/*
+  Output the vertices of the rings 
+  @param nfile: file to be output 
+  @param allCycles the vector of vector of rings
+*/
+void outputRings(string nfile, std::vector <vector<Vertex*> > &allCycles)
+{
+  
+  string ext ="_ringlist.dat";
+  string file = nfile+ext; 
+  FILE *out; 
+  out = fopen(file.c_str(),"w");
+  
+  for(unsigned int i = 0; i < allCycles.size(); i++)
+    {
+      for(unsigned int j = 0; j < allCycles[i].size(); j++)
+	fprintf(out,"%d ",allCycles[i][j]->index); 
+      fprintf(out,"\n"); 
+    }
+  fclose(out); 
+
+}//outputRings()
+
 //ringstatsOut
 int main(int argc, char *argv[])
 {
@@ -492,7 +520,7 @@ int main(int argc, char *argv[])
   float areasum = 0.; 
   float bndlength; 
   float latticex, latticey; 
-
+  int depth = ringmax - 1; 
   //string out = "honeycomb1.m";
 
   //Debug 
@@ -503,10 +531,12 @@ int main(int argc, char *argv[])
 
   read_xyz(argv[1],bilayer,true);
   readParameters(argv[2],bondlength,basename,latticex,latticey); 
-
-  //std::cout << "Making Connections Based On Distance" << std::endl; 
-  //connectAtoms(bilayer,bondlength);
   
+  if(bondlength > 0)
+    {
+      std::cout << "Making Connections Based On Distance" << std::endl; 
+      connectAtoms(bilayer,bondlength);
+    }
   if(argc == 4)
     {
       std::cout << "Making manual connections" << std::endl; 
@@ -518,7 +548,7 @@ int main(int argc, char *argv[])
  
  //start counting cycles 
   for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
-    bilayer.vertices[i]->CountCyclesLocally(allCycles); 
+    bilayer.vertices[i]->CountCyclesLocally(depth,allCycles); 
   
   AddRings(allCycles);
   std::cout << "Sorting through the Rings Now" << std::endl; 
@@ -564,6 +594,7 @@ int main(int argc, char *argv[])
   
   ringstatsOut(countBucket,basename); 
   areastatsOut(areaBucket,areasum/(bndlength*bndlength),basename); 
+  outputRings(basename,sortedCycles); 
 
   //Running Aboav function 
   RemoveRings(bilayer); 
