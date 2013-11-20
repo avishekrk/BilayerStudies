@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 """
 Forms connectivity table for a silicon bilayer, by connecting the Si to O. 
-./connectSi2O.py FILE DIST
+./connectSi2O.py XYZ DIST RING
 
-FILE:    XYZ File with coordinates 
-DIST     Distance that the oxygens need to be within the silicons
+XYZ:    XYZ File with coordinates 
+DIST:   Distance that the oxygens need to be within the silicons
+RING:   Ring list  
 """
 
 import sys
@@ -75,6 +76,10 @@ def connectSi2O(atom,coordinates,rmax=1.25,Verbose=False):
                     rij = coordinates[i] - coordinates[j]
                     r = np.sum(rij*rij)
                     if(r < rmax): connect.append([i,j])
+    connect.append([963,2382])
+    connect.append([296,2382])
+    connect.append([969,2383])
+    connect.append([967,2383])
     return np.array(connect,dtype=int)
 
 def outputConnect(basename,connect): 
@@ -94,6 +99,61 @@ def outputConnect(basename,connect):
         outfile.write("%d %d\n"%(con[0],con[1]))
     outfile.close()
 
+def readRings(filename,verbose=False):
+    """
+    reads in the Ringlist
+    
+    readRings(filename,verbose=False)
+    
+    inputs:
+    filename
+    verbose
+
+    returns:
+    list of rings. 
+    """
+    rings = []
+    infile = open(filename,"r")
+    for line in infile:
+        rings.append( np.array(line.strip('\n').split()[:],dtype=int) )
+        if(verbose):
+            print rings[-1]
+    infile.close()
+    
+    return rings
+
+def ORings(ring,connect):
+    """
+    Documentation coming soon
+    """
+    oring=[]
+    for i in range(len(ring)):
+        atomi = ring[i]
+        if i == (len(ring) - 1):
+            atomj = ring[0]
+        else:
+            atomj = ring[i+1]
+        #print "%d %d"%(atomi,atomj)
+        olist=[]
+        for i in range(len(connect)):
+            if(connect[i][0] == atomi or connect[i][0] == atomj):
+                #print "Found A Match"
+                #print connect[i]
+                #print connect[i][1]
+                olist.append(connect[i][1])
+        #print olist     
+        for x in olist:
+            if(olist.count(x) == 2):
+                #print "Found Bridging Oxygen:%d"%x
+                oring.append(x)
+                break 
+    #print oring
+    #print ring 
+    for i in range(len(ring)):
+        print "%d "%ring[i],
+        print "%d "%oring[i],
+    print ""
+
 
 def main():
 
@@ -104,18 +164,16 @@ def main():
 
     print "Looking for connections"
     connect = connectSi2O(atom,coordinates)
+    
     outputConnect(basename,connect)
 
-#    print "Output Connectivity Table:%s"%(basename)+".con"
- #   outfile=open(basename+".con","w")
-  #  outfile.write("%d\n"%len(connect))
-   # for con in connect:
-    #    outfile.write("%d %d\n"%(con[0],con[1]))
-   # outfile.close()
+    rings=readRings(sys.argv[3])
     
+    for ring in rings:
+        ORings(ring,connect)
 
 
-if __name__ == "__main__" and len(sys.argv) == 3:
+if __name__ == "__main__" and len(sys.argv) == 4:
     main()
 else:
     print "Not Enough Input Arguements: %d"%len(sys.argv)

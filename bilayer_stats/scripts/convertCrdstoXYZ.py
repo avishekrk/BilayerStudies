@@ -6,6 +6,8 @@ Converts Mark Wilson's crds to xyz format
 FILE:    .crds FILE
 NUMO:    Number of Oxygens
 NUMSI    Number of Silicons 
+Note silicons are printed out first and it is assumed the oxygens
+are listed first in the xyz file.  
 """
 
 import sys
@@ -34,17 +36,16 @@ def main(verbose=False):
     coordinates = np.array(coordinates,dtype=float)
 
     assert len(coordinates) == numo + numsi, "Number of oxygens: %d and silicons: %d do not match"%(numo,numsi)
-
     
     #output into xyz format using numoxygens and numsilicons
     infile = open(basename+".xyz","w")
     infile.write("%d\n"%len(coordinates))
     infile.write("%s\n"%(basename))
-    for line in coordinates[:numo]:
-        infile.write("O ")
-        infile.write("%f %f %f\n"%(line[0],line[1],line[2]))
     for line in coordinates[numo:]:
         infile.write("Si ")
+        infile.write("%f %f %f\n"%(line[0],line[1],line[2]))
+    for line in coordinates[:numo]:
+        infile.write("O ")
         infile.write("%f %f %f\n"%(line[0],line[1],line[2]))
     infile.close()
 
