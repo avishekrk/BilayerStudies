@@ -271,17 +271,17 @@ void polygonGraphics(std::vector <std::vector<Vertex*> > &allCycles, string nfil
   string file = nfile+ext; 
    
 
-  unsigned int minRing = 4; 
-  unsigned int maxRing = 10; 
+  unsigned int minRing = 4; //4 
+  unsigned int maxRing = 10; //10
 
-  const char *colors[11];
-  colors[4]="Blue";
-  colors[5]="Black";
-  colors[6]="Yellow";
-  colors[7]="Green";
-  colors[8]="Red";
-  colors[9]="Purple";
-  colors[10]="Cyan";
+  const char *colors[11]; //11
+  colors[4]="Blue"; //4
+  colors[5]="Black"; //5
+  colors[6]="Yellow"; //6
+  colors[7]="Green"; //7
+  colors[8]="Red"; //8
+  colors[9]="Purple"; //9
+  colors[10]="Cyan"; //10
 
   FILE* poly; 
   poly = fopen(file.c_str(), "w"); 
@@ -293,7 +293,7 @@ void polygonGraphics(std::vector <std::vector<Vertex*> > &allCycles, string nfil
     {
       first=true;
       fprintf(poly,","); 
-      fprintf(poly,"%s",colors[minRing]);
+      fprintf(poly,"%s",colors[minRing]); 
       fprintf(poly,",\n"); 
       
       fprintf(poly, "Polygon[{\n"); 
@@ -320,7 +320,7 @@ void polygonGraphics(std::vector <std::vector<Vertex*> > &allCycles, string nfil
 	  fprintf(poly, "}\n"); 
 	}//i loop over cycle
       fprintf(poly, "}]\n");//closes up Polygon
-      minRing += 1; 
+      minRing += 1; //1 
     }//for color of rings 
 
   fprintf(poly, "}]\n");//closes of Graphics
@@ -366,7 +366,7 @@ void secondSort(Graph &bilayer, std::vector<std::vector<Vertex*> > &allCycles, i
 {
   for(unsigned int k = 0; k < bilayer.vertices[i]->rings.size(); k++) //iterate through ring list of vertex i to find a ring greater than seven  
     {
-      if(bilayer.vertices[i]->rings[k].size() < 7)
+      if(bilayer.vertices[i]->rings[k].size() < 7) //7
 	continue; 
       std::vector <Vertex*> kCycle = bilayer.vertices[i]->rings[k]; 
       for(unsigned int l = 0; l< bilayer.vertices[i]->rings.size(); l++)//iterate through all rings of the vertex to find smaller rings that are apart of the greater 
@@ -383,7 +383,7 @@ void secondSort(Graph &bilayer, std::vector<std::vector<Vertex*> > &allCycles, i
 		    num_matches++; 
 		}//n loop over the vertices of the kCycle 
 	    }//m loop over the vertices of lCycle 
-	  if(num_matches > 3)
+	  if(num_matches > 3) //3
 	    {
 	      for(unsigned int o = 0; o < allCycles.size(); o++)
 		{
@@ -518,7 +518,9 @@ int main(int argc, char *argv[])
   float bondlength; 
   string basename; 
   float areasum = 0.; 
-  float bndlength; 
+  float bndlength;
+  float bndlength2; 
+  float deviation; 
   float latticex, latticey; 
   int depth = ringmax - 1; 
   //string out = "honeycomb1.m";
@@ -529,7 +531,7 @@ int main(int argc, char *argv[])
     std::cout << "argv[" << i << "]: " << argv[i] << std::endl; 
  
 
-  read_xyz(argv[1],bilayer,true);
+  read_xyz(argv[1],bilayer);
   readParameters(argv[2],bondlength,basename,latticex,latticey); 
   
   if(bondlength > 0)
@@ -544,9 +546,14 @@ int main(int argc, char *argv[])
       MakeHoney(bilayer,basename); 
     }
   
-
+  //Remove Ring 
+  std::cout << "x: " << bilayer.vertices[971]->x << "y: " << bilayer.vertices[971]->y << std::endl; 
+  std::cout << "Before:Number of connections to 971: " << bilayer.vertices[971]->edges.size() << std::endl; 
+  bilayer.vertices[971]->RemoveEdge(bilayer.vertices[152]); 
+  std::cout << "After:Number of connections to 971: " << bilayer.vertices[971]->edges.size() << std::endl; 
  
  //start counting cycles 
+  std::cout << "Counting Rings" << std::endl; 
   for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
     bilayer.vertices[i]->CountCyclesLocally(depth,allCycles); 
   
@@ -580,13 +587,16 @@ int main(int argc, char *argv[])
   PolygonPBC(sortedCycles); 
   polygonGraphics(sortedCycles,basename); 
   bndlength = avgbnd_length(bilayer,latticex,latticey); 
-  
+  bndlength2 = avgbnd_lengthtwo(bilayer,latticex,latticey); 
+  deviation = sqrt(bndlength2-bndlength*bndlength); 
 
   for(int i = 0; i < ringmax; i++)
     areasum += areaBucket[i]; 
   
   std::cout << "sum of area bucket " << areasum << std::endl; 
   std::cout << "average bond length " << avgbnd_length(bilayer,latticex,latticey) << std::endl; 
+  std::cout << "average bond lenth squared" << avgbnd_lengthtwo(bilayer,latticex,latticey) << std::endl; 
+  std::cout << "deviation bond length: " << deviation << std::endl; 
   std::cout << "area/avgbondlength*2 " << areasum/( bndlength*bndlength ) << std::endl; 
   
   for(int i = 0; i < ringmax; i++)
@@ -595,11 +605,11 @@ int main(int argc, char *argv[])
   ringstatsOut(countBucket,basename); 
   areastatsOut(areaBucket,areasum/(bndlength*bndlength),basename); 
   outputRings(basename,sortedCycles); 
-
+  outputConnect(bilayer,latticex,latticey); 
   //Running Aboav function 
   RemoveRings(bilayer); 
   AddRings(allCycles);
-  Aboav(allCycles,aboavBucket,aboavStack); 
+  Aboav(allCycles,aboavBucket,aboavStack,ringmax); 
 
   
   return 0; 

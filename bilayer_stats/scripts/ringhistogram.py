@@ -33,8 +33,7 @@ def getData(filename):
     return value,data,ring
 
 
-
-def ringareahistogram(ringfile,areafile,title):
+def ringareahistogram(ringfile,areafile,title,avg,std):
     """
     Plot axes with shared x axes 
     """
@@ -51,6 +50,7 @@ def ringareahistogram(ringfile,areafile,title):
 
             
     f, axarr = plt.subplots(3)
+    assert len(ind) == len(ringstats), "Too many rings:%d"%(len(ringstats))
     rects1 = axarr[0].bar(ind+(0.35/2),ringstats,0.35,color='r')
     axarr[0].set_title("Ring Statistics, $\mu_{2} = $ %.2f" %(mu2))
     axarr[0].set_ylabel('Ring Count')
@@ -62,7 +62,7 @@ def ringareahistogram(ringfile,areafile,title):
     print "newdesnity",newdensity 
     if(xarea[0] == 8):
         print "Big Rings"
-        axarr[1].set_title(r'$<l>_{proj}$=1.01 \pm 0.012 \rho = %.4f$'%(1/(2*newdensity)))
+        axarr[1].set_title(r'$<l>_{proj}$=%.3f $\pm$ %.3f $\rho = $%.4f'%(avg,std,1/(2*newdensity)))
     else:
         axarr[1].set_title(r'$<l>_{proj}$=1.99 $\pm$ 0.043 $\rho =$%.4f'%(1/newdensity))
     axarr[1].set_ylabel(r'$\frac{A}{<l>^{2}}$')
@@ -105,94 +105,30 @@ def ringareahistogram(ringfile,areafile,title):
     plt.savefig(title+"_stats.png",dpi=125)
     print "Figure saved to %s_stats.png"%title
 
-
-def ringareahistogram1(ringfile,areafile,title):
+def bondlength(filename):
     """
-    Plot axes with shared x axes 
+    Calculates average bondlength and standard deviation
+    
+    bondlength(filename):
+    
+    filename: file with bond lengths
     """
-    mu2, ring = getData(ringfile)
-    area_length, area = getData(areafile)
-    ringstats = np.array(ring,dtype=int)
-    areastats = np.array(area,dtype=float)
-    ind = np.arange(8)
-    width = 0.35
-
-  #  density = np.sum(ringstats)/(3.*area_length)
-    i = 8.
-    density = 0.
-    print "area_length:%f"%(area_length)
-    for ring in ringstats:
-        print "i:%f "%i
-        print "ring:%d "%ring
-        density += ((i*ring)/(6.0) )
-    #    print "density:%f"%(density)
-        i += 2.0        
-    
-    print "density (before):%f" %density
-    density = area_length/density
-    print "density:%f"%(density)
-    
-        
-    f, axarr = plt.subplots(3)
-    rects1 = axarr[0].bar(ind+(0.35/2),ringstats,0.35,color='r')
-    axarr[0].set_title("Ring Statistics, $\mu_{2} = $ %.2f" %(mu2))
-    axarr[0].set_ylabel('Ring Count')
-    axarr[0].set_ylim(0,250)
-    axarr[0].set_xticks(ind+width)
-    axarr[0].set_xticklabels( ('','','','','','','','') )
-    
-    rects2 = axarr[1].bar(ind+(0.35/2),areastats,0.35,color='b')
-    axarr[1].set_title(r'$<l>=$1.01 Area per Ring $\frac{A}{2<l>^{2}N} = $ %.2f $\rho=$%.4f'%(area_length/(2*ringstats.sum()),1/density))
-    axarr[1].set_ylabel(r'$\frac{A}{<l>^{2}}$')
-    axarr[1].set_ylim(0,2400)
-    axarr[1].set_xticks(ind+width)
-    axarr[1].set_xticklabels( ('','','','','','','','') )
-    
-    areaPerRing = (areastats/ringstats)
-    areaPerRing[np.isnan(areaPerRing)] = 0 
-    print "areaPerRing"
-    print areaPerRing
-    
-    rects3 = axarr[2].bar(ind+(0.35/2),areaPerRing,0.35,color='b')
-    axarr[2].set_title(r'Average Area per Ring')
-    axarr[2].set_ylabel(r'$\frac{A}{<l>^{2}N_{r}}$')
-    axarr[2].set_ylim(0,40)
-    axarr[2].set_xticks(ind+width)
-    axarr[2].set_xticklabels( ('8','10','12','14','16','18','20','22') )
-    axarr[2].set_xlabel('Ring Size')
-
-    for rect in rects1:
-        height = rect.get_height()
-        axarr[0].text(rect.get_x()+rect.get_width()/2., 1.025*height, '%d'%int(height),
-                    ha='center', va='bottom')
-
-    for rect in rects2:
-        height = rect.get_height()
-        axarr[1].text(rect.get_x()+rect.get_width()/2., 1.025*height, '%.2f'%float(height),
-                      ha='center', va='bottom')
-
-
-    for rect in rects3:
-        height = rect.get_height()
-        axarr[2].text(rect.get_x()+rect.get_width()/2., 1.025*height, '%.2f'%float(height),
-                      ha='center', va='bottom')
-
-    #print title
-    plt.show()
-    plt.savefig(title+"_stats.png",dpi=125)
-    #plt.clf()
-
-# <codecell>
-
-#ringareahistogram1(ringfiles[-1],areafiles[-1],titles[-1])
+    bonds = []
+    infile = open(filename,"r")
+    for line in infile:
+        bonds.append( line.strip('\n').split()[0] )
+    infile.close()
+    bonds = np.array(bonds,dtype=float)
+    return bonds.mean(), bonds.std()
 
 def main():
     ringfile=sys.argv[1]
-    areafile=sys.argv[1]
+    areafile=sys.argv[2]
     title=sys.argv[1].split('_')[0]
-    ringareahistogram(sys.argv[1],sys.argv[2],title)
+    avgbond, stdbond = bondlength(sys.argv[3])
+    ringareahistogram(ringfile,areafile,title,avgbond,stdbond)
 
-if __name__ == "__main__" and len(sys.argv) == 3:
+if __name__ == "__main__" and len(sys.argv) == 4:
     main()
 else:
     print "Not enough input arguements: %d"%(len(sys.argv))

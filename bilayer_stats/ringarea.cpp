@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <cstdio>
 
 #include "vertex.h"
 #include "ringarea.h"
@@ -238,6 +239,13 @@ float avgbnd_length(Graph &bilayer,float latticex, float latticey)
   float bnd_length=0; 
   int nbonds = 0; 
   float xij,yij,zij,r;
+  FILE *out; 
+  out = fopen("bonlength.dat","w"); 
+  if(out == NULL)
+    {
+      std::cerr << "Cannot open file for write" << std::endl; 
+      exit(1); 
+    }
 
   for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
     {
@@ -258,6 +266,46 @@ float avgbnd_length(Graph &bilayer,float latticex, float latticey)
 	  zij = bilayer.vertices[i]->z - bilayer.vertices[i]->edges[j]->z;
 	  r = sqrt( xij*xij + yij*yij + zij*zij );
 	  bnd_length += r; 
+	  nbonds += 1; 
+	  fprintf(out,"%f %d: %f %f %d: %f %f\n",r, bilayer.vertices[i]->index, bilayer.vertices[i]->x,bilayer.vertices[i]->y,bilayer.vertices[i]->edges[j]->index,
+		  bilayer.vertices[i]->edges[j]->x,bilayer.vertices[i]->edges[j]->y);
+	  
+	}//j loop over the edges of the ith vertex 
+    }//i loop over the vertices 
+  fclose(out); 
+
+  return bnd_length/((float)nbonds); 
+}//avgbnd_length 
+
+
+/*
+  Calculates the average bond length of all the bonds. 
+ */
+float avgbnd_lengthtwo(Graph &bilayer,float latticex, float latticey)
+{
+  float bnd_length=0; 
+  int nbonds = 0; 
+  float xij,yij,zij,r;
+
+  for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
+    {
+      for(unsigned int j = 0; j < bilayer.vertices[i]->edges.size(); j++)
+	{
+	  xij = bilayer.vertices[i]->x - bilayer.vertices[i]->edges[j]->x;
+	  if(xij > (latticex/2))
+	    xij -= latticex; 
+	  if(xij < -(latticex/2))
+	    xij += latticex; 
+	  
+	  yij = bilayer.vertices[i]->y - bilayer.vertices[i]->edges[j]->y;
+	  if(yij > (latticey/2) )
+	    yij -= latticey; 
+	  if(yij < -(latticey/2))
+	    yij += latticey; 
+
+	  zij = bilayer.vertices[i]->z - bilayer.vertices[i]->edges[j]->z;
+	  r = sqrt( xij*xij + yij*yij + zij*zij );
+	  bnd_length += r*r; 
 	  nbonds += 1; 
 	  
 	}//j loop over the edges of the ith vertex 
@@ -313,3 +361,31 @@ void PolygonPBC(std::vector<std::vector<Vertex*> > &sortedCycles, bool Debug)
     }//i loop over rings 
 
 }//PolygonPBC()
+
+
+/*
+  Calculates the average bond length of all the bonds. 
+ */
+void outputConnect(Graph &bilayer,float latticex, float latticey)
+{
+  float bnd_length=0; 
+  int nbonds = 0; 
+  float xij,yij,zij,r;
+  FILE *out; 
+  out = fopen("connectivity.dat","w"); 
+  if(out == NULL)
+    {
+      std::cerr << "Cannot open file for write" << std::endl; 
+      exit(1); 
+    }
+
+  for(unsigned int i = 0; i < bilayer.vertices.size(); i++)
+    {
+      fprintf(out,"%d ",bilayer.vertices[i]->index); 
+      for(unsigned int j = 0; j < bilayer.vertices[i]->edges.size(); j++)
+	fprintf(out,"%d ",bilayer.vertices[i]->edges[j]->index); 
+      fprintf(out,"\n"); 
+    }//i loop over the vertices 
+  fclose(out); 
+  
+}//outputConnect 

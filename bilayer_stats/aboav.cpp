@@ -105,12 +105,12 @@ double aboavAverage(std::vector <std::vector<Vertex*> > &rings)
    @param average value of the neighboring rings 
    @param iCycle the size of the ring 
  */
-void fillAboavBucket(double aboavBucket[], double &average, std::vector<Vertex*> &iCycle, std::vector<std::vector<double> > &aboavStack)
+void fillAboavBucket(double aboavBucket[], double &average, std::vector<Vertex*> &iCycle, std::vector<std::vector<double> > &aboavStack, int ringmax)
 {
   std::vector <double> list; 
-  for(unsigned int i =0; i < 12; i++) aboavBucket[i]=0; 
+  for(int i =0; i < ringmax; i++) aboavBucket[i]=0; //12
   aboavBucket[iCycle.size()]= average; 
-  for(unsigned int i =0; i < 12; i++) list.push_back(aboavBucket[i]); 
+  for(int i =0; i < ringmax; i++) list.push_back(aboavBucket[i]); //12 
   aboavStack.push_back(list); 
   list.clear(); 
 }
@@ -119,10 +119,10 @@ void fillAboavBucket(double aboavBucket[], double &average, std::vector<Vertex*>
  @param aboavStack has neighboring rings averages
  @return vector containing the aboav function 
 */
-std::vector <double> globalAboav(std::vector<std::vector<double> > &aboavStack)
+std::vector <double> globalAboav(std::vector<std::vector<double> > &aboavStack, int ringmax)
 {
   std::vector <double> aboavfunction; 
-  for(unsigned int i =0; i < 12; i++) aboavfunction.push_back(0); 
+  for(int i =0; i < ringmax; i++) aboavfunction.push_back(0); //12 
     
   double sum, counter;  
   for(unsigned int i =0; i < aboavStack[0].size(); i++)
@@ -232,7 +232,7 @@ std::vector <std::vector <Vertex*> > findEdges(std::vector <Vertex*> &ring)
 /**
    Calculates the Aboav function 
  */
-void Aboav(std::vector<std::vector <Vertex*> > &allCycles, double aboavBucket [],std::vector<std::vector<double> > &aboavStack)
+void Aboav(std::vector<std::vector <Vertex*> > &allCycles, double aboavBucket [],std::vector<std::vector<double> > &aboavStack, int ringmax)
 {
   double average; //value;  
   std::vector <Vertex*> iCycle; 
@@ -247,12 +247,12 @@ void Aboav(std::vector<std::vector <Vertex*> > &allCycles, double aboavBucket []
       aboavDiagnostic(iCycle, pairs, rings); 
        //Calculate Average 
       average = aboavAverage(rings);
-      fillAboavBucket(aboavBucket, average, iCycle,aboavStack);
+      fillAboavBucket(aboavBucket, average, iCycle,aboavStack,ringmax);
       iCycle.clear(); 
       pairs.clear(); 
       rings.clear(); 
     }
-  std::vector <double> aboavfunction = globalAboav(aboavStack); 
+  std::vector <double> aboavfunction = globalAboav(aboavStack,ringmax); 
   AboavStackDump(aboavStack); 
   
   for(unsigned int i =0; i < aboavfunction.size(); i++)
