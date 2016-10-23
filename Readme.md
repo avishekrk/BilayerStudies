@@ -28,6 +28,9 @@ three-dimensional networks are plotted in Jmol.
 
 # Installation
 
+To compile of the ring counter use the Makefile in bilayer_stats/src/Makefile.
+The plotting routines are are in bilayer_stats/plotting. 
+
 ---
 
 # Usage 
@@ -41,6 +44,10 @@ three-dimensional networks are plotted in Jmol.
 * coordiantes.con: connectivity matrix
 
 ---
+
+# License
+
+This software is released under the Create Common Attributions License. 
 
 # References
     
